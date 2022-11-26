@@ -71,3 +71,11 @@ def api_getarrangeclasshistory(request):
 def api_selectcourse(request):
     ret_getdict = {'code': 400, 'msg': "查询失败"}
     return JsonResponse(ret_getdict)
+
+def api_autochangeclasstable(request):
+    ret_getdict = {'code': 400, 'msg': "查询失败"}
+    return JsonResponse(ret_getdict)
+
+def api_manualchangeclasstable(request):
+    ret_getdict = {'code': 400, 'msg': "查询失败"}
+    return JsonResponse(ret_getdict)

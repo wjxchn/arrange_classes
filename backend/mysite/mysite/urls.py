@@ -35,4 +35,6 @@ urlpatterns = [
     path("deleteclass/", api.api_deleteclass),
     path("getarrangeclasshistory/", api.api_getarrangeclasshistory),
     path("selectcourse/", api.api_selectcourse),
+    path("autochangeclasstable/", api.api_autochangeclasstable),
+    path("manualchangeclasstable/", api.api_manualchangeclasstable),
 ]
