@@ -9,7 +9,7 @@ priority_course = [1]*6
 
 def schedule_score(population, constraints, elite_num):
     '''
-    population :第一位是种群，第二位课程
+    population :第一维是种群，第二维课程
     contraints : 约束列表
     elite：精英数量
     '''
@@ -96,14 +96,12 @@ def course_score(course,constraint, alpha=1.0,beta=1.0, gamma=1.0):
     """
     #计算时间得分
     times = course.course_time
-    #总共课程节数
-    num = len(times.class_num)
     score_day = 0.0
-    for day_ in times.day:
-        score_day += weight_day[day_-1]
     score_section = 0.0
-    for section_ in times.class_num:
-        score_section += weight_section[section_-1]
+    for time in times:
+        score_day += weight_day[time.day-1]
+        score_section += weight_section[time.class_num-1]
+
     score_time = score_day + score_section #暂时没考虑星期和节的权重差别
 
     #计算约束得分
