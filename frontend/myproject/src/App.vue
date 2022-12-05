@@ -1,16 +1,17 @@
 <template>
   <div>
+    <top-header></top-header>
     <router-view></router-view>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import TopHeader from './components/TopHeader.vue'
 
 export default {
   name: 'App',
   components: {
-    HelloWorld
+    TopHeader
   }
 }
 </script>
