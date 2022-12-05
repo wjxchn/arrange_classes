@@ -64,7 +64,8 @@ def api_arrangeclass(request):
                 }
             print(res)
             return JsonResponse(res)
-        except:
+        except Exception as ex:
+            print(ex)
             ret_getdict = {'code': 400, 'msg': "排课失败"}
             return JsonResponse(ret_getdict)
     else:
