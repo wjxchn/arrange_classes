@@ -1,5 +1,6 @@
-from django.http import JsonResponse,HttpResponse
-from db.models import Author, Publish, Book
+from django.http import JsonResponse, HttpResponse
+from db.models import Author, User, Student, Teacher, Admin, Time, Course, Course_constraint, Classroom, Course_table
+from mysite.genetic import GeneticOptimize
 
 def api_test(request):
     if request.method == 'POST':
@@ -49,8 +50,26 @@ def api_deleteclass(request):
     return JsonResponse(ret_getdict)
 
 def api_arrangeclass(request):
-    ret_getdict = {'code': 400, 'msg': "查询失败"}
-    return JsonResponse(ret_getdict)
+    if request.method == 'POST':
+        try:
+            res = {'code': 100, 'msg': '排课成功'}
+            ga = GeneticOptimize()
+            courses = ga.evolution(Course.objects.all())
+            res['ans'] = {}
+            print(res)
+            for course in courses:
+                res['ans'][course.course_id] = {
+                    'time': str(course._time),
+                    'classroom': str(course._classroom),
+                }
+            print(res)
+            return JsonResponse(res)
+        except:
+            ret_getdict = {'code': 400, 'msg': "排课失败"}
+            return JsonResponse(ret_getdict)
+    else:
+        ret_getdict = {'code': 400, 'msg': "排课失败"}
+        return JsonResponse(ret_getdict)
 
 def api_addclassroom(request):
     ret_getdict = {'code': 400, 'msg': "查询失败"}
@@ -69,5 +88,13 @@ def api_getarrangeclasshistory(request):
     return JsonResponse(ret_getdict)
 
 def api_selectcourse(request):
+    ret_getdict = {'code': 400, 'msg': "查询失败"}
+    return JsonResponse(ret_getdict)
+
+def api_autochangeclasstable(request):
+    ret_getdict = {'code': 400, 'msg': "查询失败"}
+    return JsonResponse(ret_getdict)
+
+def api_manualchangeclasstable(request):
     ret_getdict = {'code': 400, 'msg': "查询失败"}
     return JsonResponse(ret_getdict)
