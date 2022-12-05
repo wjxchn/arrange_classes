@@ -1,58 +1,66 @@
 <template>
-  <div class="hello">
-    <h1>{{ msg }}</h1>
-    <p>
-      For a guide and recipes on how to configure / customize this project,<br>
-      check out the
-      <a href="https://cli.vuejs.org" target="_blank" rel="noopener">vue-cli documentation</a>.
-    </p>
-    <h3>Installed CLI Plugins</h3>
-    <ul>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-babel" target="_blank" rel="noopener">babel</a></li>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-eslint" target="_blank" rel="noopener">eslint</a></li>
-    </ul>
-    <h3>Essential Links</h3>
-    <ul>
-      <li><a href="https://vuejs.org" target="_blank" rel="noopener">Core Docs</a></li>
-      <li><a href="https://forum.vuejs.org" target="_blank" rel="noopener">Forum</a></li>
-      <li><a href="https://chat.vuejs.org" target="_blank" rel="noopener">Community Chat</a></li>
-      <li><a href="https://twitter.com/vuejs" target="_blank" rel="noopener">Twitter</a></li>
-      <li><a href="https://news.vuejs.org" target="_blank" rel="noopener">News</a></li>
-    </ul>
-    <h3>Ecosystem</h3>
-    <ul>
-      <li><a href="https://router.vuejs.org" target="_blank" rel="noopener">vue-router</a></li>
-      <li><a href="https://vuex.vuejs.org" target="_blank" rel="noopener">vuex</a></li>
-      <li><a href="https://github.com/vuejs/vue-devtools#vue-devtools" target="_blank" rel="noopener">vue-devtools</a></li>
-      <li><a href="https://vue-loader.vuejs.org" target="_blank" rel="noopener">vue-loader</a></li>
-      <li><a href="https://github.com/vuejs/awesome-vue" target="_blank" rel="noopener">awesome-vue</a></li>
-    </ul>
-  </div>
+  <a-table :columns="columns" :data="data" />
 </template>
 
 <script>
+import { reactive } from 'vue';
+
 export default {
-  name: 'HelloWorld',
-  props: {
-    msg: String
-  }
+  setup() {
+    const columns = [
+      {
+        title: 'Name',
+        dataIndex: 'name',
+      },
+      {
+        title: 'Salary',
+        dataIndex: 'salary',
+      },
+      {
+        title: 'Address',
+        dataIndex: 'address',
+      },
+      {
+        title: 'Email',
+        dataIndex: 'email',
+      },
+    ];
+    const data = reactive([{
+      key: '1',
+      name: 'Jane Doe',
+      salary: 23000,
+      address: '32 Park Road, London',
+      email: 'jane.doe@example.com'
+    }, {
+      key: '2',
+      name: 'Alisa Ross',
+      salary: 25000,
+      address: '35 Park Road, London',
+      email: 'alisa.ross@example.com'
+    }, {
+      key: '3',
+      name: 'Kevin Sandra',
+      salary: 22000,
+      address: '31 Park Road, London',
+      email: 'kevin.sandra@example.com'
+    }, {
+      key: '4',
+      name: 'Ed Hellen',
+      salary: 17000,
+      address: '42 Park Road, London',
+      email: 'ed.hellen@example.com'
+    }, {
+      key: '5',
+      name: 'William Smith',
+      salary: 27000,
+      address: '62 Park Road, London',
+      email: 'william.smith@example.com'
+    }]);
+
+    return {
+      columns,
+      data
+    }
+  },
 }
 </script>
-
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-h3 {
-  margin: 40px 0 0;
-}
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
-}
-</style>
