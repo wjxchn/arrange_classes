@@ -30,6 +30,12 @@ class Time(models.Model):
     day = models.IntegerField()
     class_num = models.IntegerField()
 
+class Classroom(models.Model):
+    classroom_id = models.IntegerField(primary_key=True)
+    classroom_name = models.CharField(max_length=100)
+    classroom_capacity = models.IntegerField()
+    classroom_place = models.CharField(max_length=200)
+
 class Course(models.Model):
     course_id = models.IntegerField(primary_key=True)
     course_name = models.CharField(max_length=32)
@@ -40,7 +46,7 @@ class Course(models.Model):
     course_score = models.FloatField()
     course_teacher = models.ManyToManyField(Teacher)
     course_time = models.ManyToManyField(Time)
-    course_classroom = models.IntegerField()
+    course_classroom = models.ManyToManyField(Classroom)
     course_student = models.ManyToManyField(Student)
 
 class Course_constraint(models.Model):
@@ -51,12 +57,6 @@ class Course_constraint(models.Model):
     course_biggest_day_number = models.IntegerField()
     max_course_room_ratio = models.FloatField()
     illegal_course_before = models.ManyToManyField(Course)
-
-class Classroom(models.Model):
-    classroom_id = models.IntegerField(primary_key=True)
-    classroom_name = models.CharField(max_length=100)
-    classroom_capacity = models.IntegerField()
-    classroom_place = models.CharField(max_length=200)
 
 class Course_table(models.Model):
     course_id = models.AutoField(primary_key=True)
