@@ -12,6 +12,11 @@ weight_section = collections.defaultdict(lambda: 1.0)
 # 课程类型优先级
 priority_course_type = collections.defaultdict(lambda: 1.0)
 
+#约束优先级定义
+odd_week_priority = 12
+course_biggest_day_number_priority = 8
+course_smallest_day_number_priority  = 9
+
 def schedule_score(population, elite_num):
     '''
     population: 第一维是种群，第二维课程
@@ -115,39 +120,17 @@ def course_score(course, alpha=1.0,beta=1.0, gamma=1.0):
         # sections = np.array(sections)
     #是否单双周
     if course.course_constraint.course_is_odd_week:
-        weeks_set = list(set(weeks))
-        weeks_list = np.sort(np.array(weeks_set))
-        odd_flag = False
-        for i,num in enumerate(weeks_list):
-            if i==len(weeks_list)-1:
-                odd_flag = True
-                break
-            if weeks_list[i+1]-weeks_list[i]!=2:
-                break
-        if odd_flag:
-            score_constraint += 12
+        if is_odd_week(weeks):
+            score_constraint += odd_week_priority
     #每周最大/最小排课天数
     if course.course_constraint.course_biggest_day_number!=-1 or course.course_constraint.course_smallest_day_number!=-1:
-        max_day = -1
-        min_day = 1e9
-        cur_day = set()
-        pre_week = weeks[0]
-        for i in range(len(weeks)):
-            if weeks[i]==pre_week:
-                cur_day.add(days[i])
-                pre_week = weeks[i]
-            else:
-                max_day = max(max_day, len(cur_day))
-                min_day = min(min_day, len(cur_day))
-                cur_day = set()
-                cur_day.add(days[i])
-                pre_week = weeks[i]
+        max_day, min_day = get_max_min_day(weeks, days)
         if course.course_constraint.course_biggest_day_number!=-1:
             if max_day <= course.course_constraint.course_biggest_day_number:
-                score_constraint += 8
+                score_constraint += course_biggest_day_number_priority
         if course.course_constraint.course_smallest_day_number!=-1:
             if min_day >= course.course_constraint.course_smallest_day_number:
-                score_constraint += 9
+                score_constraint += course_smallest_day_number_priority
     # TODO 完善别的约束
 
 
@@ -158,3 +141,32 @@ def course_score(course, alpha=1.0,beta=1.0, gamma=1.0):
 
     score = alpha * score_time + beta * score_constraint - gamma * score_room
     return score
+
+def is_odd_week(weeks):
+    weeks_set = list(set(weeks))
+    weeks_list = np.sort(np.array(weeks_set))
+    odd_flag = False
+    for i, num in enumerate(weeks_list):
+        if i == len(weeks_list) - 1:
+            odd_flag = True
+            break
+        if weeks_list[i + 1] - weeks_list[i] != 2:
+            break
+    return odd_flag
+
+def get_max_min_day(weeks, days):
+    max_day = -1
+    min_day = 1e9
+    cur_day = set()
+    pre_week = weeks[0]
+    for i in range(len(weeks)):
+        if weeks[i] == pre_week:
+            cur_day.add(days[i])
+            pre_week = weeks[i]
+        else:
+            max_day = max(max_day, len(cur_day))
+            min_day = min(min_day, len(cur_day))
+            cur_day = set()
+            cur_day.add(days[i])
+            pre_week = weeks[i]
+    return max_day, min_day
