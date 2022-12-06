@@ -38,20 +38,18 @@ def schedule_score(population, elite_num):
                         confict+=1
             #不同课程冲突
             for j in range(i+1, n):
-                #同一教室同一时间冲突
-                if p[i].course_classroom==p[j].course_classroom:
-                    for timeA in p[i].course_time:
-                        for timeB in p[j].course_time:
-                            if timeA.week==timeB.week and timeA.day==timeB.day and \
-                                timeA.class_num==timeB.class_num:
+                for timeA in p[i].course_time:
+                    for timeB in p[j].course_time:
+                        if timeA.week==timeB.week and timeA.day==timeB.day \
+                            and timeA.class_num==timeB.class_num:
+                            #同一教室同一时间冲突
+                            if p[i].course_classroom.classroom_id==p[j].course_classroom.classroom_id:
                                 confict += 1
-                #同一老师同一时间冲突
-                if p[i].course_teacher == p[j].course_teacher:
-                    for timeA in p[i].course_time:
-                        for timeB in p[j].course_time:
-                            if timeA.week == timeB.week and timeA.day == timeB.day and \
-                                    timeA.class_num == timeB.class_num:
-                                confict += 1
+                            #同一老师同一时间冲突
+                            for pi_teacher in p[i].course_teacher:
+                                for pj_teacher in p[j].course_teacher:
+                                    if pi_teacher == pj_teacher:
+                                        confict += 1
         conficts.append(confict)
 
     for courses in population:

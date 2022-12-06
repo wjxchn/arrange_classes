@@ -60,7 +60,7 @@ def api_arrangeclass(request):
             for course in courses:
                 res['ans'][course.course_id] = {
                     'time': str(course.course_time),
-                    'classroom': str(course.course_classroom),
+                    'classroom': str(course.course_classroom.classroom_id),
                 }
             print(res)
             return JsonResponse(res)

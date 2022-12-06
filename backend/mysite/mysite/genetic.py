@@ -21,7 +21,7 @@ class MyCourse:
         self.course_score = course.course_score
         self.course_teacher = [t.teacher_id for t in Course.course_teacher.through.objects.filter(course_id=self.course_id)] # list for teacher_id
         self.course_time = [] # list for MyTime
-        self.course_classroom = [] # list for classroom_id
+        self.course_classroom = None # list for classroom_id
         self.course_student = []
         self.course_constraint = MyCourseConstraint(self)
 
@@ -70,7 +70,7 @@ class MyTime:
     def __sub__(self, obj):
         return self.class_num_for_semester() - obj.class_num_for_semester()
 
-def rand_classroom(course, roomRange=50):
+def rand_classroom(course, roomRange=1):
     res = MyClassroom(classroom_id=np.random.randint(1, roomRange+1))
     return res
 
@@ -88,8 +88,11 @@ def rand_time(course, semester_range='2021-1', num=1):
         st_week = np.random.randint(week_range[0], week_range[1] - course.weeks, 1)[0]
 
         for num_per_week in course.num_per_weeks:
+            st_class_num = np.random.choice([x for x in range(class_num_range[0], class_num_range[1] + 1) \
+                if x + num_per_week - 1 <= 5 \
+                    or (x >= 11 and x + num_per_week - 1 <= 14) \
+                    or (x >= 6 and x + num_per_week - 1 <= 10)])
             day = np.random.randint(day_range[0], day_range[1] + 1, 1)[0]
-            st_class_num = np.random.randint(class_num_range[0], class_num_range[1] - num_per_week, 1)[0]
             for week in range(st_week, st_week + course.weeks):
                 for class_num in range(st_class_num, st_class_num + num_per_week):
                     res.append(MyTime(semester_range, week, day, class_num))
@@ -97,7 +100,7 @@ def rand_time(course, semester_range='2021-1', num=1):
     return res
 
 class GeneticOptimize:
-    def __init__(self, popsize=32, mutprob=0.3, elite=8, maxiter=100):
+    def __init__(self, popsize=64, mutprob=0.3, elite=8, maxiter=100):
         # 种群的规模（0-100）
         self.popsize = popsize
         # 变异概率
