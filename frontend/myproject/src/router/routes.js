@@ -1,20 +1,27 @@
 const routes = [
     {
-        name: 'index',
-        path: '/index',
-        component: () => import('../view/IndexView.vue')
+        name: 'homepage',
+        path: '/',
+        component: () => import('../view/HomePage.vue')
         // 注意不能使用 "@/view/index.vue"
         // vite 不识别的, 会出现找不到模块的情况
     },
     {
-        name: 'details',
-        path: '/details',
-        component: () => import('../view/DetailsView.vue')
+        name: 'showresult',
+        path: '/showresult',
+        component: () => import('../view/ShowResult.vue')
+        // 注意不能使用 "@/view/index.vue"
+        // vite 不识别的, 会出现找不到模块的情况
     },
     {
-        name: 'helloworld',
-        path: '/helloworld',
-        component: () => import('../components/HelloWorld.vue')
+        name: 'governdata',
+        path: '/governdata',
+        component: () => import('../view/GovernData.vue')
+    },
+    {
+        name: 'aboutus',
+        path: '/aboutus',
+        component: () => import('../view/AboutUs.vue')
     },
 ]
 

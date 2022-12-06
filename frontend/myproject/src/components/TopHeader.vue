@@ -1,21 +1,11 @@
 <template>
     <div class="menu-demo">
         <a-menu mode="horizontal" :default-selected-keys="['1']">
-        <a-menu-item key="0" :style="{ padding: 0, marginRight: '38px' }" disabled>
-            <div
-            :style="{
-                width: '80px',
-                height: '30px',
-                borderRadius: '2px',
-                background: 'var(--color-fill-3)',
-                cursor: 'text',
-            }"
-            />
-        </a-menu-item>
-        <a-menu-item key="1">Home</a-menu-item>
-        <a-menu-item key="2" @click="$router.push('helloworld')">Solution</a-menu-item>
-        <a-menu-item key="3">Cloud Service</a-menu-item>
-        <a-menu-item key="4">Cooperation</a-menu-item>
+        <a-menu-item key="0" style="padding: 0; marginRight: 38px; color: #A43525; font-weight:900; font-size:20px;" disabled>排课系统</a-menu-item>
+        <a-menu-item key="1" @click="$router.push({path:'/'})">排课</a-menu-item>
+        <a-menu-item key="2" @click="$router.push('showresult')">排课结果查看</a-menu-item>
+        <a-menu-item key="3" @click="$router.push('governdata')">数据管理</a-menu-item>
+        <a-menu-item key="4" @click="$router.push('aboutus')">关于</a-menu-item>
         </a-menu>
     </div>
 </template>
