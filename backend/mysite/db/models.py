@@ -31,7 +31,7 @@ class Time(models.Model):
     class_num = models.IntegerField()
 
 class Classroom(models.Model):
-    classroom_id = models.IntegerField(primary_key=True)
+    classroom_id = models.AutoField(primary_key=True)
     classroom_name = models.CharField(max_length=100)
     classroom_capacity = models.IntegerField()
     classroom_place = models.CharField(max_length=200)
