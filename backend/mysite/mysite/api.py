@@ -54,13 +54,13 @@ def api_arrangeclass(request):
         try:
             res = {'code': 100, 'msg': '排课成功'}
             ga = GeneticOptimize()
-            courses = ga.evolution(Course.objects.all())
+            courses = ga.evolution(Course.objects.all(), )
             res['ans'] = {}
             print(res)
             for course in courses:
                 res['ans'][course.course_id] = {
-                    'time': str(course._time),
-                    'classroom': str(course._classroom),
+                    'time': str(course.course_time),
+                    'classroom': str(course.course_classroom),
                 }
             print(res)
             return JsonResponse(res)
