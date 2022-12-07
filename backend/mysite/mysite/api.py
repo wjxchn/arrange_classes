@@ -29,14 +29,89 @@ def api_register(request):
     return JsonResponse(ret_getdict)
 
 
+# 获取用户详细信息
 def api_getuserinfo(request):
-    ret_getdict = {'code': 400, 'msg': "查询失败"}
-    return JsonResponse(ret_getdict)
+    if request.method == 'POST':
+        try:
+            user_id = request.POST.get('id')
+            user_set = User.objects.filter(user_id=user_id)
+            if user_set.exists():
+                if user_set[0].user_type == 0:
+                    student_set = Student.objects.filter(user_id=user_id)
+                    user = {
+                        'id': user_id,
+                        'type': '学生',
+                        'username': user_set[0].user_name,
+                        'name': student_set[0].student_name,
+                        'sex': student_set[0].student_sex,
+                        'major': student_set[0].student_major,
+                        'class': student_set[0].student_class
+                    }
+                elif user_set[0].user_type == 1:
+                    teacher_set = Teacher.objects.filter(user_id=user_id)
+                    user = {
+                        'id': user_id,
+                        'type': '教师',
+                        'username': user_set[0].user_name,
+                        'name': teacher_set[0].teacher_name,
+                        'sex': teacher_set[0].teacher_sex,
+                        'title': teacher_set[0].teacher_profession_title
+                    }
+                else:
+                    user = {
+                        'id': user_id,
+                        'type': '管理员',
+                        'username': user_set[0].user_name,
+                    }
+                ret_getdict = {'code': 200, 'msg': "查看成功", 'user': user}
+                return JsonResponse(ret_getdict)
+            else:
+                ret_getdict = {'code': 400, 'msg': "查看失败"}
+                return JsonResponse(ret_getdict)
+        except Exception as ex:
+            print(ex)
+            ret_getdict = {'code': 400, 'msg': "查看失败"}
+            return JsonResponse(ret_getdict)
+    else:
+        ret_getdict = {'code': 400, 'msg': "查看失败"}
+        return JsonResponse(ret_getdict)
 
 
+# 修改用户详细信息
 def api_changeuserinfo(request):
-    ret_getdict = {'code': 400, 'msg': "查询失败"}
-    return JsonResponse(ret_getdict)
+    if request.method == 'POST':
+        try:
+            user_id = request.POST.get('id')
+            user = User.objects.get(user_id=user_id)
+            if user is not None:
+                user_type = user.user_type
+                user.user_name = request.POST.get('username')
+                if user_type == 0:
+                    student = Student.objects.get(user_id=user_id)
+                    student.student_name = request.POST.get('name')
+                    student.student_sex = request.POST.get('sex')
+                    student.student_major = request.POST.get('major')
+                    student.student_class = request.POST.get('class')
+                    student.save()
+                elif user_type == 1:
+                    teacher = Teacher.objects.get(user_id=user_id)
+                    teacher.teacher_name = request.POST.get('name')
+                    teacher.teacher_sex = request.POST.get('sex')
+                    teacher.teacher_profession_title = request.POST.get('title')
+                    teacher.save()
+                user.save()
+                ret_getdict = {'code': 200, 'msg': "修改成功"}
+                return JsonResponse(ret_getdict)
+            else:
+                ret_getdict = {'code': 400, 'msg': "修改失败"}
+                return JsonResponse(ret_getdict)
+        except Exception as ex:
+            print(ex)
+            ret_getdict = {'code': 400, 'msg': "修改失败"}
+            return JsonResponse(ret_getdict)
+    else:
+        ret_getdict = {'code': 400, 'msg': "修改失败"}
+        return JsonResponse(ret_getdict)
 
 
 def api_addclass(request):

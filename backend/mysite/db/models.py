@@ -1,8 +1,8 @@
 from django.db import models
 
 class User(models.Model):
-    user_id = models.IntegerField(primary_key=True)
-    user_type = models.CharField(max_length=100)
+    user_id = models.AutoField(primary_key=True)
+    user_type = models.IntegerField()
     user_name = models.CharField(max_length=100)
 
 class Student(models.Model):
