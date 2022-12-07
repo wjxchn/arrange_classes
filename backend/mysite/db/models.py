@@ -1,8 +1,8 @@
 from django.db import models
 
 class User(models.Model):
-    user_id = models.IntegerField(primary_key=True)
-    user_type = models.CharField(max_length=100)
+    user_id = models.AutoField(primary_key=True)
+    user_type = models.IntegerField()
     user_name = models.CharField(max_length=100)
 
 class Student(models.Model):
@@ -31,7 +31,7 @@ class Time(models.Model):
     class_num = models.IntegerField()
 
 class Classroom(models.Model):
-    classroom_id = models.IntegerField(primary_key=True)
+    classroom_id = models.AutoField(primary_key=True)
     classroom_name = models.CharField(max_length=100)
     classroom_capacity = models.IntegerField()
     classroom_place = models.CharField(max_length=200)
