@@ -1,4 +1,5 @@
 from django.http import JsonResponse, HttpResponse
+from django.contrib.auth import hashers
 from db.models import Author, User, Student, Teacher, Admin, Time, Course, Course_constraint, Classroom, Course_table
 from mysite.genetic import GeneticOptimize
 
@@ -19,14 +20,81 @@ def api_test(request):
         return JsonResponse(ret_getdict)
 
 
+# 用户登录
 def api_login(request):
-    ret_getdict = {'code': 400, 'msg': "查询失败"}
-    return JsonResponse(ret_getdict)
+    if request.method == 'POST':
+        try:
+            username = request.POST.get('username')
+            user = User.objects.filter(user_name=username)
+            if not user.exists():
+                ret_getdict = {'code': 400, 'msg': "用户不存在"}
+                return JsonResponse(ret_getdict)
+            password = request.POST.get('password')
+            if hashers.check_password(password, user[0].user_password):
+                ret_getdict = {'code': 200, 'msg': "登录成功"}
+                return JsonResponse(ret_getdict)
+            else:
+                ret_getdict = {'code': 400, 'msg': "密码错误"}
+                return JsonResponse(ret_getdict)
+        except Exception as ex:
+            print(ex)
+            ret_getdict = {'code': 400, 'msg': "登录失败"}
+            return JsonResponse(ret_getdict)
+    else:
+        ret_getdict = {'code': 400, 'msg': "登录失败"}
+        return JsonResponse(ret_getdict)
 
 
+# 用户注册
 def api_register(request):
-    ret_getdict = {'code': 400, 'msg': "查询失败"}
-    return JsonResponse(ret_getdict)
+    if request.method == 'POST':
+        try:
+            username = request.POST.get('username')
+            user = User.objects.filter(user_name=username)
+            if user.exists():
+                ret_getdict = {'code': 400, 'msg': "该用户已注册"}
+                return JsonResponse(ret_getdict)
+            password = request.POST.get('password')
+            type = int(request.POST.get('type'))
+            user = User(
+                user_type=type,
+                user_name=username,
+                user_password=hashers.make_password(password)
+            )
+            user.save()
+            print(user.user_id)
+            if type == 0:
+                student = Student(
+                    user_id=user.user_id,
+                    student_name=request.POST.get('name'),
+                    student_sex=request.POST.get('sex'),
+                    student_major=request.POST.get('major'),
+                    student_class=request.POST.get('class')
+                )
+                student.save()
+            elif type == 1:
+                teacher = Teacher(
+                    user_id=user.user_id,
+                    teacher_name=request.POST.get('name'),
+                    teacher_sex=request.POST.get('sex'),
+                    teacher_profession_title=request.POST.get('title'),
+                )
+                teacher.save()
+            else:
+                admin = Admin(
+                    user_id=user.user_id
+                )
+                admin.save()
+            ret_getdict = {'code': 200, 'msg': "注册成功"}
+            return JsonResponse(ret_getdict)
+        except Exception as ex:
+            print(ex)
+            ret_getdict = {'code': 400, 'msg': "注册失败"}
+            return JsonResponse(ret_getdict)
+
+    else:
+        ret_getdict = {'code': 400, 'msg': "注册失败"}
+        return JsonResponse(ret_getdict)
 
 
 # 获取用户详细信息
@@ -294,6 +362,7 @@ def api_deleteclassroom(request):
     else:
         ret_getdict = {'code': 400, 'msg': "删除失败"}
         return JsonResponse(ret_getdict)
+
 
 def api_getarrangeclasshistory(request):
     ret_getdict = {'code': 400, 'msg': "查询失败"}
