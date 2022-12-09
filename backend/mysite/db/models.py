@@ -56,6 +56,13 @@ class Course_constraint(models.Model):
     course_is_odd_week = models.BooleanField()
     course_smallest_day_number = models.IntegerField()
     course_biggest_day_number = models.IntegerField()
+    # 每天最小/大上课节数
+    course_smallest_sections = models.IntegerField()
+    course_biggest_sections = models.IntegerField()
+    #是否可在周末上课
+    course_can_weekends = models.BooleanField()
+    # 不安排排课的节数
+    course_no_sections = models.CharField(max_length=32)
     max_course_room_ratio = models.FloatField()
     illegal_course_before = models.ManyToManyField(Course)
 

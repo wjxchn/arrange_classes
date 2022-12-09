@@ -47,9 +47,18 @@ class MyCourseConstraint:
         self.course_id = course.course_id
         self.course_continue = course_constraint.course_continue if course_constraint != None else True
         self.course_is_odd_week = course_constraint.course_is_odd_week if course_constraint != None else False
+        #每周最大/小排课天数
         self.course_smallest_day_number = course_constraint.course_smallest_day_number if course_constraint != None else -1
         self.course_biggest_day_number = course_constraint.course_biggest_day_number if course_constraint != None else -1
+        #课程容量和教室容量的比例范围
         self.max_course_room_ratio = course_constraint.max_course_room_ratio if course_constraint != None else -1
+        #每天最小/大上课节数
+        self.course_smallest_sections = course_constraint.course_smallest_sections if course_constraint!=None else -1
+        self.course_biggest_sections = course_constraint.course_biggest_sections if course_constraint!=None else -1
+        # TODO 数据库这个类型是str 得处理一下
+        self.course_no_sections = course_constraint.course_no_sections if course_constraint!=None else []
+        # 是否可在周末上班
+        self.course_can_weekends = course_constraint.course_can_weekends if course_constraint!=None else False
 
 class MyTime:
     def __init__(self, semester=None, week=None, day=None, class_num=None) -> None:
@@ -58,11 +67,19 @@ class MyTime:
         self.day = day
         self.class_num = class_num
 
-    def __repr__(self) -> str:        
+    def __repr__(self) -> str:
         return '-'.join([self.semester, str(self.week), str(self.day), str(self.class_num)])
-    
+
     def class_num_for_semester(self):
         return (self.week - 1) * 7 * 12 + (self.day - 1) * 12 + self.class_num
+    def __cmp__(self,other):
+        if self.week==other.week and self.day==other.day:
+            return self.class_num<other.class_num
+        elif self.week == other.week:
+            return self.day<other.day
+        else:
+            return self.week<other.week
+
 
     def __lt__(self, obj):
         return self.class_num_for_semester() < obj.class_num_for_semester()
