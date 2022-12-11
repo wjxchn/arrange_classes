@@ -31,7 +31,7 @@ def api_login(request):
                 return JsonResponse(ret_getdict)
             password = request.POST.get('password')
             if hashers.check_password(password, user[0].user_password):
-                ret_getdict = {'code': 200, 'msg': "登录成功"}
+                ret_getdict = {'code': 200, 'msg': "登录成功", 'id': user[0].user_id}
                 return JsonResponse(ret_getdict)
             else:
                 ret_getdict = {'code': 400, 'msg': "密码错误"}
