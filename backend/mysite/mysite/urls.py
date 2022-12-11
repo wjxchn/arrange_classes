@@ -22,6 +22,7 @@ urlpatterns = [
     path("test/", api.api_test),
     path("login/", api.api_login),
     path("register/", api.api_register),
+    path("getuser/", api.api_getuser),
     path("getuserinfo/", api.api_getuserinfo),
     path("changeuserinfo/", api.api_changeuserinfo),
     path("addclass/", api.api_addclass),

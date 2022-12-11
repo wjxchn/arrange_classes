@@ -96,6 +96,10 @@ def api_register(request):
         ret_getdict = {'code': 400, 'msg': "注册失败"}
         return JsonResponse(ret_getdict)
 
+# 获取全部用户列表
+def api_getuser(request):
+    ret_getdict = {'code': 400, 'msg': "查询失败"}
+    return JsonResponse(ret_getdict)
 
 # 获取用户详细信息
 def api_getuserinfo(request):
@@ -346,7 +350,8 @@ def api_modifyclassroominfo(request):
 def api_deleteclassroom(request):
     if request.method == 'POST':
         try:
-            classroom_id = request.POST.get('id')
+            classroom_id = request.POST.get('data[id]')
+            print(request.POST)
             classroom = Classroom.objects.get(classroom_id=classroom_id)
             if classroom is not None:
                 classroom.delete()
@@ -382,3 +387,5 @@ def api_autochangeclasstable(request):
 def api_manualchangeclasstable(request):
     ret_getdict = {'code': 400, 'msg': "查询失败"}
     return JsonResponse(ret_getdict)
+
+

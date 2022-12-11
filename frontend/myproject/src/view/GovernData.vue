@@ -17,6 +17,15 @@
           <div>显示的是编辑教室信息</div>
         </a-modal>
       </template>
+      <template #delete_optional="{ record }">
+        <a-button @click="classroom_delete_handleClick">删除教室信息</a-button>
+        <a-modal v-model:visible="classroom_delete_visible_var" @ok="classroom_delete_handleOk(record)" @cancel="classroom_delete_handleCancel">
+          <template #title>
+            提示
+          </template>
+          <div>确认删除该教室吗？</div>
+        </a-modal>
+      </template>
     </a-table>
     <a-table v-show="layout=='byclasses'" :columns="class_columns" :data="class_data" :pagination="ispagination" column-resizable>
       <template #optional="{ record }">
@@ -34,9 +43,9 @@
         <a-button @click="user_handleClick(record)">编辑用户信息</a-button>
         <a-modal v-model:visible="user_visible_var" @ok="user_handleOk" @cancel="user_handleCancel">
           <template #title>
-            Title
+            提示
           </template>
-          <div>显示的是编辑用户信息</div>
+          <div>编辑用户信息</div>
         </a-modal>
       </template>
     </a-table>
@@ -45,6 +54,7 @@
 
 <script>
 import { reactive, ref, getCurrentInstance } from 'vue';
+import qs from 'qs'
 export default {
   setup() {
     const classroom_visible_var = ref(false);
@@ -57,6 +67,19 @@ export default {
     };
     const classroom_handleCancel = () => {
       classroom_visible_var.value = false;
+    }
+    const classroom_delete_visible_var = ref(false);
+
+    const classroom_delete_handleClick = () => {
+      classroom_delete_visible_var.value = true;
+    };
+    const classroom_delete_handleOk = (record) => {
+      console.log(record.id)
+      deleteClassroomData(record.id)
+      classroom_delete_visible_var.value = false;
+    };
+    const classroom_delete_handleCancel = () => {
+      classroom_delete_visible_var.value = false;
     }
     const class_visible_var = ref(false);
 
@@ -96,8 +119,12 @@ export default {
         dataIndex: 'place',
       },
       {
-        title: '操作',
+        title: '编辑操作',
         slotName: 'optional',
+      },
+      {
+        title: '删除操作',
+        slotName: 'delete_optional',
       },
     ];
     const classroom_data = reactive([]);
@@ -240,11 +267,23 @@ export default {
         console.log(res);
         res.data.classrooms.forEach(element => {
           classroom_data.push({
+            id: element.id,
             name: element.name,
             capacity: element.capacity,
             place: element.place
           })
         });
+      }) .catch((res) => {
+        console.log(res);
+      });
+    }
+    const deleteClassroomData = function(id){
+      console.log(id)
+      let data={"id": id}
+      proxy.$http.post("deleteclassroom/", qs.stringify({
+        data
+      })).then((res) => {
+        console.log(res);
       }) .catch((res) => {
         console.log(res);
       });
@@ -263,6 +302,10 @@ export default {
       classroom_handleClick,
       classroom_handleOk,
       classroom_handleCancel,
+      classroom_delete_visible_var,
+      classroom_delete_handleClick,
+      classroom_delete_handleOk,
+      classroom_delete_handleCancel,
       class_visible_var,
       class_handleClick,
       class_handleOk,
