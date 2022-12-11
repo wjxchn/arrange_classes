@@ -44,8 +44,7 @@
 </template>
 
 <script>
-import { reactive, ref } from 'vue';
-
+import { reactive, ref, getCurrentInstance } from 'vue';
 export default {
   setup() {
     const classroom_visible_var = ref(false);
@@ -250,7 +249,16 @@ export default {
         user_name:'admin',
         type:'管理员',
       },
-    ]);
+    ])
+    const {proxy} = getCurrentInstance()
+    const getClassroomData = function(){
+      proxy.$http.get("getclassroom/").then((res) => {
+        console.log(res);
+      }) .catch((res) => {
+        console.log(res);
+      });
+    }
+    getClassroomData()
     return {
       classroom_columns,
       class_columns,
