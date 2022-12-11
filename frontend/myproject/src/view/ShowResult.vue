@@ -46,7 +46,7 @@
       >
       </a-select>
     </a-space>
-    <a-table :columns="columns" :data="data" :pagination="ispagination"/>
+    <a-table :columns="columns" :data="data" :pagination="ispagination" column-resizable/>
   </div>
 </template>
 
