@@ -100,23 +100,7 @@ export default {
         slotName: 'optional',
       },
     ];
-    const classroom_data = reactive([
-      {
-        name: '主M201',
-        capacity: 200,
-        place: '主M201',
-      },
-      {
-        name: '主M202',
-        capacity: 150,
-        place: '主M202',
-      },
-      {
-        name: '主M203',
-        capacity: 100,
-        place: '主M203',
-      },
-    ]);
+    const classroom_data = reactive([]);
     const class_columns = [
       {
         title: '名称',
@@ -254,6 +238,13 @@ export default {
     const getClassroomData = function(){
       proxy.$http.get("getclassroom/").then((res) => {
         console.log(res);
+        res.data.classrooms.forEach(element => {
+          classroom_data.push({
+            name: element.name,
+            capacity: element.capacity,
+            place: element.place
+          })
+        });
       }) .catch((res) => {
         console.log(res);
       });
