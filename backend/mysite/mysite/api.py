@@ -388,4 +388,14 @@ def api_manualchangeclasstable(request):
     ret_getdict = {'code': 400, 'msg': "查询失败"}
     return JsonResponse(ret_getdict)
 
+def api_getcoursetablebyclassroom(request):
+    ret_getdict = {'code': 400, 'msg': "查询失败"}
+    return JsonResponse(ret_getdict)
 
+def api_getcoursetablebyteacher(request):
+    ret_getdict = {'code': 400, 'msg': "查询失败"}
+    return JsonResponse(ret_getdict)
+
+def api_getcoursetablebystudent(request):
+    ret_getdict = {'code': 400, 'msg': "查询失败"}
+    return JsonResponse(ret_getdict)
