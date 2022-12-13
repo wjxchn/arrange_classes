@@ -38,7 +38,8 @@ class Classroom(models.Model):
     classroom_place = models.CharField(max_length=200)
 
 class Course(models.Model):
-    course_id = models.IntegerField(primary_key=True)
+    course_id = models.AutoField(primary_key=True)
+    course_code = models.CharField(max_length=32)
     course_name = models.CharField(max_length=32)
     course_max_capacity = models.IntegerField()
     course_introduction = models.CharField(max_length=200)
