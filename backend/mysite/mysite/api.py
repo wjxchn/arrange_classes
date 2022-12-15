@@ -96,10 +96,12 @@ def api_register(request):
         ret_getdict = {'code': 400, 'msg': "注册失败"}
         return JsonResponse(ret_getdict)
 
+
 # 获取全部用户列表
 def api_getuser(request):
     ret_getdict = {'code': 400, 'msg': "查询失败"}
     return JsonResponse(ret_getdict)
+
 
 # 获取用户详细信息
 def api_getuserinfo(request):
@@ -387,14 +389,50 @@ def api_manualchangeclasstable(request):
     ret_getdict = {'code': 400, 'msg': "查询失败"}
     return JsonResponse(ret_getdict)
 
+
+# 按照教室查看课表
 def api_getcoursetablebyclassroom(request):
-    ret_getdict = {'code': 400, 'msg': "查询失败"}
-    return JsonResponse(ret_getdict)
+    if request.method == 'POST':
+        try:
+            classroom_id = request.POST.get('id')
+            ret_getdict = {'code': 200, 'msg': "查询成功"}
+            return JsonResponse(ret_getdict)
+        except Exception as ex:
+            print(ex)
+            ret_getdict = {'code': 400, 'msg': "查询失败"}
+            return JsonResponse(ret_getdict)
+    else:
+        ret_getdict = {'code': 400, 'msg': "查询失败"}
+        return JsonResponse(ret_getdict)
 
+
+# 按照教师查看课表
 def api_getcoursetablebyteacher(request):
-    ret_getdict = {'code': 400, 'msg': "查询失败"}
-    return JsonResponse(ret_getdict)
+    if request.method == 'POST':
+        try:
+            user_id = request.POST.get('id')
+            ret_getdict = {'code': 200, 'msg': "查询成功"}
+            return JsonResponse(ret_getdict)
+        except Exception as ex:
+            print(ex)
+            ret_getdict = {'code': 400, 'msg': "查询失败"}
+            return JsonResponse(ret_getdict)
+    else:
+        ret_getdict = {'code': 400, 'msg': "查询失败"}
+        return JsonResponse(ret_getdict)
 
+
+# 按照学生查看课表
 def api_getcoursetablebystudent(request):
-    ret_getdict = {'code': 400, 'msg': "查询失败"}
-    return JsonResponse(ret_getdict)
+    if request.method == 'POST':
+        try:
+            user_id = request.POST.get('id')
+            ret_getdict = {'code': 200, 'msg': "查询成功"}
+            return JsonResponse(ret_getdict)
+        except Exception as ex:
+            print(ex)
+            ret_getdict = {'code': 400, 'msg': "查询失败"}
+            return JsonResponse(ret_getdict)
+    else:
+        ret_getdict = {'code': 400, 'msg': "查询失败"}
+        return JsonResponse(ret_getdict)
