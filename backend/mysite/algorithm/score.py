@@ -36,35 +36,36 @@ def schedule_score(population, elite_num):
     conficts = []
     scores = []
     final_scores = []
-    hard_weight = 10000
+    hard_weight = 10000000
     soft_weight = 1
     n = len(population[0])
-    for p in population:
+    for pid, p in enumerate(population):
         confict = 0
-        # 自身排课就冲突
-        for i in range(0, n - 1):
-            times = p[i].course_time
-            hours = len(times)
-            for index1 in range(0, hours - 1):
-                for index2 in range(index1 + 1, hours):
-                    if times[index1].week == times[index2].week \
-                            and times[index1].day == times[index2].day \
-                            and times[index1].class_num == times[index2].class_num:
-                        confict += 1
+        
+        for i in range(0, n):
+            # 自身排课就冲突
+            mp = collections.defaultdict(lambda: 0)
+            for time in p[i].course_time:
+                confict += mp[time]
+                mp[time] += 1
+
             # 不同课程冲突
-            for j in range(i + 1, n):
-                for timeA in p[i].course_time:
-                    for timeB in p[j].course_time:
-                        if timeA.week == timeB.week and timeA.day == timeB.day \
-                                and timeA.class_num == timeB.class_num:
-                            # 同一教室同一时间冲突
-                            if p[i].course_classroom.classroom_id == p[j].course_classroom.classroom_id:
-                                confict += 1
-                            # 同一老师同一时间冲突
-                            for pi_teacher in p[i].course_teacher:
-                                for pj_teacher in p[j].course_teacher:
-                                    if pi_teacher == pj_teacher:
-                                        confict += 1
+            mp = collections.defaultdict(
+                lambda: {
+                    'classroom': collections.defaultdict(lambda: 0),
+                    'teacher': collections.defaultdict(lambda: 0),
+                }
+            )
+            for time in p[i].course_time:
+                # 教室冲突
+                confict += mp[time.class_num_for_semester()]['classroom'][p[i].course_classroom.classroom_id]
+                mp[time.class_num_for_semester()]['classroom'][p[i].course_classroom.classroom_id] += 1
+
+                # 教师冲突
+                for teacher_id in p[i].course_teacher:
+                    confict += mp[time.class_num_for_semester()]['teacher'][teacher_id]
+                    mp[time.class_num_for_semester()]['teacher'][teacher_id] += 1
+
         conficts.append(confict)
 
     for courses in population:
@@ -123,7 +124,7 @@ def course_score(course, alpha=1.0, beta=1.0, gamma=1.0):
     for time in times:
         weeks.append(time.week)
         days.append(time.day)
-        sections.append(time.section)
+        sections.append(time.class_num)
     score_constraint = 0.0
 
     # 是否连堂

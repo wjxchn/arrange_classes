@@ -80,7 +80,7 @@ def read_excel(filename):
     wb = openpyxl.load_workbook(f'{filename}')
     sheet = wb.worksheets[0]
 
-    conn = pymysql.connect(host='127.0.0.1', user='root', password='123456', database='classes_arrangement',
+    conn = pymysql.connect(host='127.0.0.1', user='root', password='macaronlin', database='classes_arrangement',
                            charset='utf8')
     cursor = conn.cursor()
 
@@ -141,6 +141,12 @@ def insert_classroom(coon, cursor, classroom,class_capa):
               f"values('{classroom}',{class_capa});"
         cursor.execute(sql)
         coon.commit()
+    else:
+        if datas[0][2] < class_capa:
+            sql = f"update db_classroom set classroom_capacity={class_capa} where classroom_name = '{classroom}';"
+            cursor.execute(sql)
+            coon.commit()
+
 
 def insert_teacher(coon, cursor, c_id, t_name, titlt):
     '''

@@ -223,16 +223,15 @@ def api_arrangeclass(request):
     if request.method == 'POST':
         try:
             res = {'code': 100, 'msg': '排课成功'}
-            ga = GeneticOptimize()
-            courses = ga.evolution(Course.objects.all(), )
-            res['ans'] = {}
-            print(res)
-            for course in courses:
-                res['ans'][course.course_id] = {
+            ga = GeneticOptimize(popsize=64, elite=16, mutprob=0.5, maxiter=500)
+            courses = ga.evolution(Course.objects.all(), Classroom.objects.all())
+            res['ans'] = {
+                course.course_id: {
+                    'teacher': str(course.course_teacher),
                     'time': str(course.course_time),
                     'classroom': str(course.course_classroom.classroom_id),
-                }
-            print(res)
+                } for course in courses
+            }
             return JsonResponse(res)
         except Exception as ex:
             print(ex)

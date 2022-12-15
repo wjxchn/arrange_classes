@@ -1,5 +1,8 @@
+import os
+import json
 import copy
 import numpy as np
+import time
 
 from db.models import User, Student, Teacher, Admin, Course, Course_constraint, Classroom, Course_table
 from algorithm.score import schedule_score
@@ -11,12 +14,15 @@ class MyCourse:
         self.course_max_capacity = course.course_max_capacity
         self.course_introduction = course.course_introduction
         self.course_hour = course.course_hour
-        if self.course_hour == 64:
-            self.weeks = 16
-            self.num_per_weeks = (2, 2)
-        else:
+        if self.course_hour % 3 == 0:
+            self.weeks = self.course_hour // 3
+            self.num_per_weeks = (3)
+        elif self.course_hour % 2 == 0:
             self.weeks = self.course_hour // 2
             self.num_per_weeks = (2)
+        else:
+            self.weeks = self.course_hour // 1
+            self.num_per_weeks = (1)
         self.course_type = course.course_type
         self.course_score = course.course_score
         self.course_teacher = [t.teacher_id for t in Course.course_teacher.through.objects.filter(course_id=self.course_id)] # list for teacher_id
@@ -37,6 +43,9 @@ class MyClassroom:
             self.classroom_name = classroom_name
             self.classroom_capacity = classroom_capacity
             self.classroom_place = classroom_place
+    
+    def __repr__(self) -> str:
+        return '-'.join(list(map(str, [self.classroom_id, self.classroom_name, self.classroom_capacity, self.classroom_place])))
 
 class MyCourseConstraint:
     def __init__(self, course):
@@ -87,14 +96,15 @@ class MyTime:
     def __sub__(self, obj):
         return self.class_num_for_semester() - obj.class_num_for_semester()
 
-def rand_classroom(course, roomRange=1):
-    res = MyClassroom(classroom_id=np.random.randint(1, roomRange+1))
+def rand_classroom(course, classrooms):
+    ok_classrooms = [classroom for classroom in classrooms if classroom.classroom_capacity >= course.course_max_capacity]
+    res = np.random.choice(ok_classrooms)
     return res
 
-def rand_time(course, semester_range='2021-1', num=1):
+def rand_time(course, semester_range='2021-1', num=-1):
     course.week_range, course.day_range, course.class_num_range = (1, 18), (1, 7), (1, 14)
     week_range, day_range, class_num_range = course.week_range, course.day_range, course.class_num_range
-    if num == 1:
+    if num == -1:
         res = MyTime()
         res.semester = semester_range
         res.week = np.random.randint(week_range[0], week_range[1] + 1, 1)[0]
@@ -103,7 +113,8 @@ def rand_time(course, semester_range='2021-1', num=1):
     else:
         res = []
         st_week = np.random.randint(week_range[0], week_range[1] - course.weeks, 1)[0]
-
+        if not isinstance(course.num_per_weeks, list):
+            course.num_per_weeks = [course.num_per_weeks]
         for num_per_week in course.num_per_weeks:
             st_class_num = np.random.choice([x for x in range(class_num_range[0], class_num_range[1] + 1) \
                 if x + num_per_week - 1 <= 5 \
@@ -113,11 +124,10 @@ def rand_time(course, semester_range='2021-1', num=1):
             for week in range(st_week, st_week + course.weeks):
                 for class_num in range(st_class_num, st_class_num + num_per_week):
                     res.append(MyTime(semester_range, week, day, class_num))
-
     return res
 
 class GeneticOptimize:
-    def __init__(self, popsize=64, mutprob=0.3, elite=8, maxiter=100):
+    def __init__(self, popsize=32, mutprob=0.3, elite=8, maxiter=100):
         # 种群的规模（0-100）
         self.popsize = popsize
         # 变异概率
@@ -128,25 +138,26 @@ class GeneticOptimize:
         self.maxiter = maxiter
         
     #随机初始化不同的种群
-    def init_population(self, courses, roomRange):
+    def init_population(self, courses, classrooms):
         self.population = []
         for _ in range(self.popsize):
             entity = []
             for course in courses:
-                course.course_time = sorted(rand_time(course, num=course.course_hour))
-                course.course_classroom = rand_classroom(course)
+                tmp = rand_time(course, num=course.course_hour)
+                course.course_time = sorted(tmp)
+                course.course_classroom = rand_classroom(course, classrooms)
                 entity.append(copy.deepcopy(course))
             self.population.append(entity)
             
     #变异
-    def mutate(self, eiltePopulation, roomRange):
+    def mutate(self, eiltePopulation, classrooms):
         #选择变异的个数
         e = np.random.randint(0, self.elite, 1)[0]
         ep = copy.deepcopy(eiltePopulation[e])
         for p in ep:
             pos = np.random.randint(0, 5, 1)[0]
             if pos == 0: # classroom
-                p.course_classroom = rand_classroom(p)
+                p.course_classroom = rand_classroom(p, classrooms)
             else:
                 _time = rand_time(p, num=p.course_hour)
                 if pos == 1: # week
@@ -186,23 +197,42 @@ class GeneticOptimize:
                 p1.course_time = sorted(p1.course_time)
         return ep1
 
-    def evolution(self, courses, roomRange=100):
+    def evolution(self, courses, classrooms):
+        save_path = os.path.join('results', '%s.json' % time.strftime('%Y-%m-%d-%H-%M-%S', time.localtime(time.time())))
+        print(save_path)
+        print('[evolution]')
         courses = [MyCourse(course) for course in courses]
+        print('init courses ok!')
+        classrooms = [MyClassroom(classroom) for classroom in classrooms]
+        print('init classrooms ok!')
         bestScore = 0
         bestcourses = None
-        self.init_population(courses, roomRange)
+        timestamp = time.time()
+        self.init_population(courses, classrooms)
+        print("init_population time: {}s".format(round(time.time()-timestamp)))
         for i in range(self.maxiter):
+            timestamp = time.time()
             eliteIndex, bestScore = schedule_score(self.population, self.elite)
-            print('Iter: {} | conflict: {}'.format(i + 1, bestScore))
+            print('Iter: {} | loss: {}, time: {}s'.format(i + 1, bestScore, round(time.time()-timestamp)))
             bestcourses = self.population[eliteIndex[0]]
             if bestScore == 0:
                 break
             newPopulation = [self.population[index] for index in eliteIndex]
             while len(newPopulation) < self.popsize:
                 if np.random.rand() < self.mutprob:
-                    newp = self.mutate(newPopulation, roomRange)
+                    newp = self.mutate(newPopulation, classrooms)
                 else:
                     newp = self.crossover(newPopulation)
                 newPopulation.append(newp)
             self.population = newPopulation
+            if i % 10 == 0:
+                result = {
+                    course.course_id: {
+                        'teacher': str(course.course_teacher),
+                        'time': str(course.course_time),
+                        'classroom': str(course.course_classroom.classroom_id),
+                    } for course in courses
+                }
+                with open(save_path, 'w', encoding='utf8') as f:
+                    json.dump(result, f, ensure_ascii=False, indent=2)
         return bestcourses
