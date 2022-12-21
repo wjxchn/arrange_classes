@@ -219,7 +219,7 @@ export default {
       },
       {
         title: '学号/工号',
-        dataIndex: 'id',
+        dataIndex: 'work_id',
       },
       {
         title: '职称',
@@ -238,29 +238,7 @@ export default {
         slotName: 'optional',
       },
     ];
-    const user_data = reactive([
-      {
-        user_name:'wjxchn',
-        type:'学生',
-        name:'王嘉鑫',
-        sex: '男',
-        id: 'SY2206216',
-        major: '软件工程',
-        class: 'SY22063'
-      },
-      {
-        user_name:'hzt',
-        type:'教师',
-        name:'何智涛',
-        sex: '男',
-        id: '05163',
-        profession_title: '讲师',
-      },
-      {
-        user_name:'admin',
-        type:'管理员',
-      },
-    ])
+    const user_data = reactive([])
     const {proxy} = getCurrentInstance()
     const getClassroomData = function(){
       proxy.$http.get("getclassroom/").then((res) => {
@@ -289,6 +267,21 @@ export default {
       });
     }
     getClassroomData()
+    const getUserData = function(){
+      proxy.$http.get("getuser/").then((res) => {
+        console.log(res);
+        res.data.users.forEach(element => {
+          user_data.push({
+            id: element.id,
+            type: element.type,
+            user_name: element.name
+          })
+        });
+      }) .catch((res) => {
+        console.log(res);
+      });
+    }
+    getUserData()
     return {
       classroom_columns,
       class_columns,

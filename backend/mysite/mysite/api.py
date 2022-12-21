@@ -99,8 +99,25 @@ def api_register(request):
 
 # 获取全部用户列表
 def api_getuser(request):
-    ret_getdict = {'code': 400, 'msg': "查询失败"}
-    return JsonResponse(ret_getdict)
+    if request.method == 'GET':
+        try:
+            user_set = User.objects.all()
+            users = []
+            for user in user_set:
+                obj = {}
+                obj['id'] = user.user_id
+                obj['type'] = user.user_type
+                obj['name'] = user.user_name
+                users.append(obj)
+            ret_getdict = {'code': 200, 'msg': "获取全部用户信息成功", 'users': users}
+            return JsonResponse(ret_getdict)
+        except Exception as ex:
+            print(ex)
+            ret_getdict = {'code': 400, 'msg': "获取全部用户信息失败"}
+            return JsonResponse(ret_getdict)
+    else:
+        ret_getdict = {'code': 400, 'msg': "获取全部用户信息失败"}
+        return JsonResponse(ret_getdict)
 
 
 # 获取用户详细信息
@@ -281,14 +298,14 @@ def api_getclassroom(request):
                     'capacity': classroom.classroom_capacity,
                     'place': classroom.classroom_place
                 })
-            ret_getdict = {'code': 200, 'msg': "查看成功", 'classrooms': classrooms}
+            ret_getdict = {'code': 200, 'msg': "获取全部教室信息成功", 'classrooms': classrooms}
             return JsonResponse(ret_getdict)
         except Exception as ex:
             print(ex)
-            ret_getdict = {'code': 400, 'msg': "查看失败"}
+            ret_getdict = {'code': 400, 'msg': "获取全部教室信息失败"}
             return JsonResponse(ret_getdict)
     else:
-        ret_getdict = {'code': 400, 'msg': "查看失败"}
+        ret_getdict = {'code': 400, 'msg': "获取全部教室信息失败失败"}
         return JsonResponse(ret_getdict)
 
 
