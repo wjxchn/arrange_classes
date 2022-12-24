@@ -1,3 +1,5 @@
+import os
+import json
 from django.http import JsonResponse, HttpResponse
 from django.contrib.auth import hashers
 from db.models import Author, User, Student, Teacher, Admin, Time, Course, Course_constraint, Classroom, Course_table
@@ -429,17 +431,50 @@ def api_manualchangeclasstable(request):
     ret_getdict = {'code': 400, 'msg': "查询失败"}
     return JsonResponse(ret_getdict)
 
-
 # 按照教室查看课表
 def api_getcoursetablebyclassroom(request):
     if request.method == 'POST':
         try:
-            classroom_id = request.POST.get('id')
-            ret_getdict = {'code': 200, 'msg': "查询成功"}
+            mp = {1: 'monday', 2: 'tuesday', 3: 'wednesday', 4: 'thursday', 5: 'friday', 6: 'saturday', 7: 'sunday'}
+            res = {str(i):{mp[j]:[] for j in range(1, 8)} for i in range(1, 15)}
+            
+            q_result_file_name = request.POST.get('result_file_name')
+            q_classroom_id = request.POST.get('classroom_id')
+            with open(os.path.join('results', q_result_file_name), encoding='utf-8') as f:
+                result = json.loads(f.read())
+                for course_id in result.keys():
+                    classroom_id = result[course_id]['classroom']
+                    teacher_id = list(map(int, result[course_id]['teacher'][1:-1].split(', ')))
+                    times = [x.split('-')[-3:] for x in result[course_id]['time'][1:-1].split(', ')]
+                    if q_classroom_id == classroom_id:
+                        for week, day, class_num in times:
+                            res[class_num][mp[int(day)]].append([int(week), course_id, teacher_id])
+                            if week == '6' and day == '2' and class_num == '14':
+                                print(course_id)
+            
+            for class_num in res.keys():
+                for day in res[class_num].keys():
+                    if len(res[class_num][day]) > 0:
+                        res[class_num][day] = sorted(res[class_num][day], key=lambda x:x[0])
+                        _tmp = []
+                        for week, course_id, teacher_id in res[class_num][day]:
+                            if len(_tmp) > 0 and course_id == _tmp[-1][1] and teacher_id == _tmp[-1][2]:
+                                _tmp[-1][0].append(week)
+                            else:
+                                _tmp.append([[week], course_id, teacher_id])
+                        res[class_num][day] = [[' '.join([
+                            '[{}-{}]'.format(week[0], week[-1]) if len(week) > 1 else '[{}]'.format(week[0]),
+                            '{}'.format(Course.objects.get(course_id=course_id).course_name),
+                            ', '.join(['{}'.format(Teacher.objects.get(teacher_id=id).teacher_name) for id in teacher_id]),
+                        ])] for  week, course_id, teacher_id in _tmp]
+                        # print(class_num, day, res[class_num][day])
+
+            # print(res)
+            ret_getdict = {'code': 200, 'msg': "查询成功", 'res': res}
             return JsonResponse(ret_getdict)
         except Exception as ex:
             print(ex)
-            ret_getdict = {'code': 400, 'msg': "查询失败"}
+            ret_getdict = {'code': 300, 'msg': "查询失败"}
             return JsonResponse(ret_getdict)
     else:
         ret_getdict = {'code': 400, 'msg': "查询失败"}
