@@ -51,10 +51,11 @@
 </template>
 
 <script>
-import { reactive, ref } from 'vue';
+import { reactive, ref, getCurrentInstance } from 'vue';
 
 export default {
   setup() {
+    const {proxy} = getCurrentInstance()
     const layout = ref('byclassrooms')
     const ispagination = false
     const handleScroll = (ev) => {
@@ -65,64 +66,13 @@ export default {
     }
     const classroomvalue = ref('');
     const classroomfieldnames = {value: 'id', label: 'text'}
-    const classroomoptions = reactive([
-      {
-        id: '1',
-        text: '主M301'
-      },
-      {
-        id: '2',
-        text: '新主楼G座201'
-      },
-      {
-        id: '3',
-        text: '4号楼301'
-      },
-      {
-        id: '4',
-        text: '主301'
-      },
-    ]);
+    const classroomoptions = reactive([]);
     const teachervalue = ref('');
     const teacherfieldnames = {value: 'id', label: 'text'}
-    const teacheroptions = reactive([
-      {
-        id: '1',
-        text: '宋友'
-      },
-      {
-        id: '2',
-        text: '林广艳'
-      },
-      {
-        id: '3',
-        text: '吴际'
-      },
-      {
-        id: '4',
-        text: '王帅'
-      },
-    ]);
+    const teacheroptions = reactive([]);
     const studentvalue = ref('');
     const studentfieldnames = {value: 'id', label: 'text'}
-    const studentoptions = reactive([
-      {
-        id: '1',
-        text: '王嘉鑫'
-      },
-      {
-        id: '2',
-        text: '李韵阳'
-      },
-      {
-        id: '3',
-        text: '马旭栋'
-      },
-      {
-        id: '4',
-        text: '王帅松'
-      },
-    ]);
+    const studentoptions = reactive([]);
     const columns = [
       {
         title: '周一',
@@ -153,135 +103,21 @@ export default {
         dataIndex: 'sunday',
       },
     ];
-    const data = reactive([
-      {
-        monday:'1',
-        tuesday:'2',
-        wednesday:'3',
-        thursday: '4',
-        friday: '5',
-        saturday: '6',
-        sunday: '7'
-      },
-      {
-        monday:'1',
-        tuesday:'2',
-        wednesday:'3',
-        thursday: '4',
-        friday: '5',
-        saturday: '6',
-        sunday: '7'
-      },
-      {
-        monday:'1',
-        tuesday:'2',
-        wednesday:'3',
-        thursday: '4',
-        friday: '5',
-        saturday: '6',
-        sunday: '7'
-      },
-      {
-        monday:'1',
-        tuesday:'2',
-        wednesday:'3',
-        thursday: '4',
-        friday: '5',
-        saturday: '6',
-        sunday: '7'
-      },
-      {
-        monday:'1',
-        tuesday:'2',
-        wednesday:'3',
-        thursday: '4',
-        friday: '5',
-        saturday: '6',
-        sunday: '7'
-      },
-      {
-        monday:'1',
-        tuesday:'2',
-        wednesday:'3',
-        thursday: '4',
-        friday: '5',
-        saturday: '6',
-        sunday: '7'
-      },
-      {
-        monday:'1',
-        tuesday:'2',
-        wednesday:'3',
-        thursday: '4',
-        friday: '5',
-        saturday: '6',
-        sunday: '7'
-      },
-      {
-        monday:'1',
-        tuesday:'2',
-        wednesday:'3',
-        thursday: '4',
-        friday: '5',
-        saturday: '6',
-        sunday: '7'
-      },
-      {
-        monday:'1',
-        tuesday:'2',
-        wednesday:'3',
-        thursday: '4',
-        friday: '5',
-        saturday: '6',
-        sunday: '7'
-      },
-      {
-        monday:'1',
-        tuesday:'2',
-        wednesday:'3',
-        thursday: '4',
-        friday: '5',
-        saturday: '6',
-        sunday: '7'
-      },
-      {
-        monday:'1',
-        tuesday:'2',
-        wednesday:'3',
-        thursday: '4',
-        friday: '5',
-        saturday: '6',
-        sunday: '7'
-      },
-      {
-        monday:'1',
-        tuesday:'2',
-        wednesday:'3',
-        thursday: '4',
-        friday: '5',
-        saturday: '6',
-        sunday: '7'
-      },
-      {
-        monday:'1',
-        tuesday:'2',
-        wednesday:'3',
-        thursday: '4',
-        friday: '5',
-        saturday: '6',
-        sunday: '7'
-      },
-      {
-        monday:'1',
-        tuesday:'2',
-        wednesday:'3',
-        thursday: '4',
-        friday: '5',
-        saturday: '6',
-        sunday: '7'
-      },
-    ]);
-
+    const data = reactive([]);
+    const getClassroomData = function(){
+      proxy.$http.get("getclassroom/").then((res) => {
+        console.log(res);
+        res.data.classrooms.forEach(element => {
+          classroomoptions.push({
+            id: element.id,
+            text: element.name,
+          })
+        });
+      }) .catch((res) => {
+        console.log(res);
+      });
+    }
+    getClassroomData()
     return {
       columns,
       data,

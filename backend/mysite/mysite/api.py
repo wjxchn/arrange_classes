@@ -223,9 +223,32 @@ def api_addclass(request):
         return JsonResponse(ret_getdict)
 
 
-def api_getclassinfo(request):
-    ret_getdict = {'code': 400, 'msg': "查询失败"}
-    return JsonResponse(ret_getdict)
+# 获取全部课程列表
+def api_getclass(request):
+    if request.method == 'GET':
+        try:
+            course_set = Course.objects.all()
+            course_list = []
+            for course in course_set:
+                course_list.append({
+                    'id': course.course_id,
+                    'code': course.course_code,
+                    'name': course.course_name,
+                    'capacity': course.course_max_capacity,
+                    'introduction': course.course_introduction,
+                    'hour': course.course_hour,
+                    'type': course.course_type,
+                    'score': course.course_score,
+                })
+            ret_getdict = {'code': 200, 'msg': "获取全部课程信息成功", 'classrooms': course_list}
+            return JsonResponse(ret_getdict)
+        except Exception as ex:
+            print(ex)
+            ret_getdict = {'code': 400, 'msg': "获取全部课程信息失败"}
+            return JsonResponse(ret_getdict)
+    else:
+        ret_getdict = {'code': 400, 'msg': "获取全部课程信息失败失败"}
+        return JsonResponse(ret_getdict)
 
 
 def api_changeclassinfo(request):

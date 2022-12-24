@@ -158,48 +158,7 @@ export default {
         slotName: 'optional',
       },
     ];
-    const class_data = reactive([
-      {
-        name:'数学分析',
-        max_capacity:30,
-        course_hour:16,
-        type: '基础课程',
-        introduction: '介绍高等数学的相关课程',
-        score: 1,
-      },
-      {
-        name:'数学分析',
-        max_capacity:30,
-        course_hour:16,
-        type: '基础课程',
-        introduction: '介绍高等数学的相关课程',
-        score: 1,
-      },
-      {
-        name:'数学分析',
-        max_capacity:30,
-        course_hour:16,
-        type: '基础课程',
-        introduction: '介绍高等数学的相关课程',
-        score: 1,
-      },
-      {
-        name:'数学分析',
-        max_capacity:30,
-        course_hour:16,
-        type: '基础课程',
-        introduction: '介绍高等数学的相关课程',
-        score: 1,
-      },
-      {
-        name:'数学分析',
-        max_capacity:30,
-        course_hour:16,
-        type: '基础课程',
-        introduction: '介绍高等数学的相关课程',
-        score: 1,
-      },
-    ]);
+    const class_data = reactive([]);
     const user_columns = [
       {
         title: '用户名',
@@ -267,6 +226,25 @@ export default {
       });
     }
     getClassroomData()
+    const getCourseData = function(){
+      proxy.$http.get("getclass/").then((res) => {
+        console.log(res);
+        res.data.classrooms.forEach(element => {
+          class_data.push({
+            id: element.id,
+            name: element.name,
+            max_capacity: element.capacity,
+            course_hour: element.hour,
+            type: element.type,
+            introduction: element.introduction,
+            score: element.score,
+          })
+        });
+      }) .catch((res) => {
+        console.log(res);
+      });
+    }
+    getCourseData()
     const getUserData = function(){
       proxy.$http.get("getuser/").then((res) => {
         console.log(res);
