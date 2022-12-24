@@ -42,4 +42,6 @@ urlpatterns = [
     path("getcoursetablebyclassroom/", api.api_getcoursetablebyclassroom),
     path("getcoursetablebyteacher/", api.api_getcoursetablebyteacher),
     path("getcoursetablebystudent/", api.api_getcoursetablebystudent),
+    path("getteacher/", api.api_getteacher),
+    path("getstudent/", api.api_getstudent),
 ]

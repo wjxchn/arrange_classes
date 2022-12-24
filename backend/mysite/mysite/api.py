@@ -476,3 +476,52 @@ def api_getcoursetablebystudent(request):
     else:
         ret_getdict = {'code': 400, 'msg': "查询失败"}
         return JsonResponse(ret_getdict)
+
+# 查看所有老师
+def api_getteacher(request):
+    if request.method == 'GET':
+        try:
+            teacher_set = Teacher.objects.all()
+            teacher_list = []
+            for teacher in teacher_set:
+                teacher_list.append({
+                    'teacher_id': teacher.teacher_id,
+                    'user_id': teacher.user_id,
+                    'name': teacher.teacher_name,
+                    'sex': teacher.teacher_sex,
+                    'profession_title': teacher.teacher_profession_title
+                })
+            ret_getdict = {'code': 200, 'msg': "获取全部教师信息成功", 'teachers': teacher_list}
+            return JsonResponse(ret_getdict)
+        except Exception as ex:
+            print(ex)
+            ret_getdict = {'code': 400, 'msg': "获取全部教师信息失败"}
+            return JsonResponse(ret_getdict)
+    else:
+        ret_getdict = {'code': 400, 'msg': "获取全部教师信息失败失败"}
+        return JsonResponse(ret_getdict)
+
+# 查看所有学生
+def api_getstudent(request):
+    if request.method == 'GET':
+        try:
+            student_set = Student.objects.all()
+            student_list = []
+            for student in student_set:
+                student_list.append({
+                    'student_id': student.student_id,
+                    'user_id': student.user_id,
+                    'name': student.student_name,
+                    'sex': student.student_sex,
+                    'major': student.student_major,
+                    'class': student.student_class
+                })
+            ret_getdict = {'code': 200, 'msg': "获取全部学生信息成功", 'students': student_list}
+            return JsonResponse(ret_getdict)
+        except Exception as ex:
+            print(ex)
+            ret_getdict = {'code': 400, 'msg': "获取全部学生信息失败"}
+            return JsonResponse(ret_getdict)
+    else:
+        ret_getdict = {'code': 400, 'msg': "获取全部学生信息失败失败"}
+        return JsonResponse(ret_getdict)

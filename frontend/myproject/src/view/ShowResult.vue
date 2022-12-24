@@ -118,6 +118,34 @@ export default {
       });
     }
     getClassroomData()
+    const getTeacherData = function(){
+      proxy.$http.get("getteacher/").then((res) => {
+        console.log(res);
+        res.data.teachers.forEach(element => {
+          teacheroptions.push({
+            id: element.teacher_id,
+            text: element.name,
+          })
+        });
+      }) .catch((res) => {
+        console.log(res);
+      });
+    }
+    getTeacherData()
+    const getStudentData = function(){
+      proxy.$http.get("getstudent/").then((res) => {
+        console.log(res);
+        res.data.students.forEach(element => {
+          studentoptions.push({
+            id: element.student_id,
+            text: element.name,
+          })
+        });
+      }) .catch((res) => {
+        console.log(res);
+      });
+    }
+    getStudentData()
     return {
       columns,
       data,
