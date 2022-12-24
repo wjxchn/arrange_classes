@@ -214,8 +214,9 @@ def insert_course(coon, cursor, c_code, c_name, c_capacity, hour, type):
 
 
 
+if __name__ == '__main__':
 
-read_excel('全校课表(1).xlsx')
+    read_excel('全校课表(1).xlsx')
 
 # print('-' in text)
 
