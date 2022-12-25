@@ -80,7 +80,7 @@ def read_excel(filename):
     wb = openpyxl.load_workbook(f'{filename}')
     sheet = wb.worksheets[0]
 
-    conn = pymysql.connect(host='127.0.0.1', user='root', password='macaronlin', database='classes_arrangement',
+    conn = pymysql.connect(host='127.0.0.1', user='root', password='wjxmysql', database='classes_arrangement',
                            charset='utf8')
     cursor = conn.cursor()
 

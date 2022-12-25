@@ -265,22 +265,17 @@ def api_deleteclass(request):
 
 def api_arrangeclass(request):
     if request.method == 'POST':
-        try:
-            res = {'code': 100, 'msg': '排课成功'}
-            ga = GeneticOptimize(popsize=64, elite=16, mutprob=0.5, maxiter=500)
-            courses = ga.evolution(Course.objects.all(), Classroom.objects.all())
-            res['ans'] = {
-                course.course_id: {
-                    'teacher': str(course.course_teacher),
-                    'time': str(course.course_time),
-                    'classroom': str(course.course_classroom.classroom_id),
-                } for course in courses
-            }
-            return JsonResponse(res)
-        except Exception as ex:
-            print(ex)
-            ret_getdict = {'code': 400, 'msg': "排课失败"}
-            return JsonResponse(ret_getdict)
+        res = {'code': 100, 'msg': '排课成功'}
+        ga = GeneticOptimize(popsize=64, elite=16, mutprob=0.5, maxiter=500)
+        courses = ga.evolution(Course.objects.all(), Classroom.objects.all())
+        res['ans'] = {
+            course.course_id: {
+                'teacher': str(course.course_teacher),
+                'time': str(course.course_time),
+                'classroom': str(course.course_classroom.classroom_id),
+            } for course in courses
+        }
+        return JsonResponse(res)
     else:
         ret_getdict = {'code': 400, 'msg': "排课失败"}
         return JsonResponse(ret_getdict)
