@@ -7,7 +7,7 @@
         <a-radio value="bystudents">根据学生查看课表</a-radio>
       </a-radio-group>
     </a-space>
-    <a-space v-show="layout=='byclassrooms'"  style="margin-bottom: 60px;">
+    <a-space v-show="layout=='byclassrooms'"  style="margin-bottom: 60px; margin-left:20px;">
       教室名称
       <a-select
         v-model="classroomvalue"
@@ -20,7 +20,7 @@
       >
       </a-select>
     </a-space>
-    <a-space v-show="layout=='byteachers'"  style="margin-bottom: 60px;">
+    <a-space v-show="layout=='byteachers'"  style="margin-bottom: 60px; margin-left:20px;">
       教师名称
       <a-select
         v-model="teachervalue"
@@ -33,7 +33,7 @@
       >
       </a-select>
     </a-space>
-    <a-space v-show="layout=='bystudents'"  style="margin-bottom: 60px;">
+    <a-space v-show="layout=='bystudents'"  style="margin-bottom: 60px; margin-left:20px;">
       学生名称
       <a-select
         v-model="studentvalue"
@@ -45,6 +45,22 @@
         @dropdown-reach-bottom="handleReachBottom"
       >
       </a-select>
+    </a-space>
+    <a-space style="margin-bottom: 60px; margin-left:20px;">
+      选择排课结果
+      <a-select
+        v-model="resultvalue"
+        :options="resultoptions"
+        :field-names="resultfieldnames"
+        :style="{width:'320px'}"
+        placeholder="Please select ..."
+        @dropdown-scroll="handleScroll"
+        @dropdown-reach-bottom="handleReachBottom"
+      >
+      </a-select>
+    </a-space>
+    <a-space style="margin-bottom: 60px; margin-left:20px;">
+      <a-button type="primary">确定</a-button>
     </a-space>
     <a-table :columns="columns" :data="data" :pagination="ispagination" column-resizable/>
   </div>
@@ -73,6 +89,9 @@ export default {
     const studentvalue = ref('');
     const studentfieldnames = {value: 'id', label: 'text'}
     const studentoptions = reactive([]);
+    const resultvalue = ref('');
+    const resultfieldnames = {value: 'id', label: 'text'}
+    const resultoptions = reactive([]);
     const columns = [
       {
         title: '周一',
@@ -146,6 +165,20 @@ export default {
       });
     }
     getStudentData()
+    const getResultData = function(){
+      proxy.$http.get("getresultlist/").then((res) => {
+        console.log(res);
+        res.data.result_list.forEach(element => {
+          resultoptions.push({
+            id: element,
+            text: element,
+          })
+        });
+      }) .catch((res) => {
+        console.log(res);
+      });
+    }
+    getResultData()
     return {
       columns,
       data,
@@ -161,7 +194,10 @@ export default {
       teacheroptions,
       studentvalue,
       studentfieldnames,
-      studentoptions
+      studentoptions,
+      resultvalue,
+      resultfieldnames,
+      resultoptions
     }
   },
 }

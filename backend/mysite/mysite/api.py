@@ -637,3 +637,8 @@ def api_getstudent(request):
     else:
         ret_getdict = {'code': 400, 'msg': "获取全部学生信息失败失败"}
         return JsonResponse(ret_getdict)
+
+def api_getresultlist(request):
+    file_list = os.listdir("./results")
+    ret_getdict = {'code': 200, 'msg': "查询排课结果列表成功", 'result_list': file_list}
+    return JsonResponse(ret_getdict)
