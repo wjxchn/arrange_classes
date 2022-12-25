@@ -462,12 +462,12 @@ def api_getcoursetablebyclassroom(request):
                                 _tmp[-1][0].append(week)
                             else:
                                 _tmp.append([[week], course_id, teacher_id])
-                        res[class_num][day] = [[' '.join([
+                        res[class_num][day] = [' '.join([
                             '[{}-{}]'.format(week[0], week[-1]) if len(week) > 1 else '[{}]'.format(week[0]),
                             '{}'.format(Course.objects.get(course_id=course_id).course_name),
                             ', '.join(['{}'.format(Teacher.objects.get(teacher_id=id).teacher_name) for id in teacher_id]),
-                        ])] for  week, course_id, teacher_id in _tmp]
-                        # print(class_num, day, res[class_num][day])
+                        ]) for  week, course_id, teacher_id in _tmp]
+
 
             # print(res)
             ret_getdict = {'code': 200, 'msg': "查询成功", 'res': res}
