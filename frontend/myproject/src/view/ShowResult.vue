@@ -60,7 +60,7 @@
       </a-select>
     </a-space>
     <a-space style="margin-bottom: 60px; margin-left:20px;">
-      <a-button type="primary">确定</a-button>
+      <a-button type="primary" @click="getdata">确定</a-button>
     </a-space>
     <a-table :columns="columns" :data="data" :pagination="ispagination" column-resizable/>
   </div>
@@ -68,7 +68,7 @@
 
 <script>
 import { reactive, ref, getCurrentInstance } from 'vue';
-
+import qs from 'qs'
 export default {
   setup() {
     const {proxy} = getCurrentInstance()
@@ -179,6 +179,81 @@ export default {
       });
     }
     getResultData()
+    const getdata = function(){
+      if(layout.value == 'byclassrooms'){
+        console.log(classroomvalue.value)
+        console.log(resultvalue.value)
+        proxy.$http.post("getcoursetablebyclassroom/", qs.stringify({"result_file_name": resultvalue.value, "classroom_id": classroomvalue.value}))
+          .then((res) => {
+          console.log(res);
+          while(data.length!=0){
+            data.pop()
+          }
+          for (var i=0;i<14;i++) {
+            data.push({})
+          }
+          for (var i=1;i<=14;i++) {
+            console.log(res.data.res[i])
+            var res_item
+            for (res_item in res.data.res[i]){
+              console.log(res.data.res[i][res_item])
+              data[i-1][res_item] = res.data.res[i][res_item]
+            }
+          }
+        }) .catch((res) => {
+          console.log(res);
+        });
+      }
+      else if(layout.value == 'byteachers'){
+        console.log(teachervalue.value)
+        console.log(resultvalue.value)
+        proxy.$http.post("getcoursetablebyteacher/", qs.stringify({"result_file_name": resultvalue.value, "teacher_id": teachervalue.value}))
+          .then((res) => {
+          console.log(res);
+          while(data.length!=0){
+            data.pop()
+          }
+          for (var i=0;i<14;i++) {
+            data.push({})
+          }
+          for (var i=1;i<=14;i++) {
+            console.log(res.data.res[i])
+            var res_item
+            for (res_item in res.data.res[i]){
+              console.log(res.data.res[i][res_item])
+              data[i-1][res_item] = res.data.res[i][res_item]
+            }
+          }
+        }) .catch((res) => {
+          console.log(res);
+        });
+      }
+      else if(layout.value == 'bystudents'){
+        console.log(studentvalue.value)
+        console.log(resultvalue.value)
+        proxy.$http.post("getcoursetablebystudent/", qs.stringify({"result_file_name": resultvalue.value, "student_id": studentvalue.value}))
+          .then((res) => {
+          console.log(res);
+          while(data.length!=0){
+            data.pop()
+          }
+          for (var i=0;i<14;i++) {
+            data.push({})
+          }
+          for (var i=1;i<=14;i++) {
+            console.log(res.data.res[i])
+            var res_item
+            for (res_item in res.data.res[i]){
+              console.log(res.data.res[i][res_item])
+              data[i-1][res_item] = res.data.res[i][res_item]
+            }
+          }
+        }) .catch((res) => {
+          console.log(res);
+        });
+      }
+      
+    }
     return {
       columns,
       data,
@@ -197,7 +272,8 @@ export default {
       studentoptions,
       resultvalue,
       resultfieldnames,
-      resultoptions
+      resultoptions,
+      getdata
     }
   },
 }
