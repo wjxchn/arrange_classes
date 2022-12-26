@@ -208,6 +208,7 @@ class GeneticOptimize:
         e = np.random.randint(0, self.elite, 1)[0]
         ep = copy.deepcopy(eiltePopulation[e])
         import collections
+        np.random.shuffle(ep)
         mp = collections.defaultdict(lambda: 0)
         for i in range(len(ep)):
             for _ in range(5):

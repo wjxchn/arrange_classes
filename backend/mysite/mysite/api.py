@@ -266,7 +266,7 @@ def api_deleteclass(request):
 def api_arrangeclass(request):
     if request.method == 'POST':
         res = {'code': 100, 'msg': '排课成功'}
-        ga = GeneticOptimize(popsize=64, elite=16, mutprob=0.2, maxiter=500)
+        ga = GeneticOptimize(popsize=32, elite=16, mutprob=0.2, maxiter=500)
         courses = ga.evolution(Course.objects.all(), Classroom.objects.all())
         res['ans'] = {
             course.course_id: {
