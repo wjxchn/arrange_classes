@@ -266,7 +266,7 @@ def api_deleteclass(request):
 def api_arrangeclass(request):
     if request.method == 'POST':
         res = {'code': 100, 'msg': '排课成功'}
-        ga = GeneticOptimize(popsize=64, elite=16, mutprob=0.5, maxiter=500)
+        ga = GeneticOptimize(popsize=64, elite=8, mutprob=0.2, maxiter=500)
         courses = ga.evolution(Course.objects.all(), Classroom.objects.all())
         res['ans'] = {
             course.course_id: {
@@ -445,8 +445,6 @@ def api_getcoursetablebyclassroom(request):
                     if q_classroom_id == classroom_id:
                         for week, day, class_num in times:
                             res[class_num][mp[int(day)]].append([int(week), course_id, teacher_id])
-                            if week == '6' and day == '2' and class_num == '14':
-                                print(course_id)
 
             for class_num in res.keys():
                 for day in res[class_num].keys():
@@ -496,8 +494,7 @@ def api_getcoursetablebyteacher(request):
                     if q_teacher_id in teachers_id:
                         for week, day, class_num in times:
                             res[class_num][mp[int(day)]].append([int(week), course_id, teachers_id, classroom_id])
-                            if week == '6' and day == '2' and class_num == '14':
-                                print(course_id)
+
             for class_num in res.keys():
                 for day in res[class_num].keys():
                     if len(res[class_num][day]) > 0:
@@ -642,3 +639,31 @@ def api_getresultlist(request):
     file_list = os.listdir("./results")
     ret_getdict = {'code': 200, 'msg': "查询排课结果列表成功", 'result_list': file_list}
     return JsonResponse(ret_getdict)
+
+from mysite.genetic import MyCourse, MyClassroom, MyTime
+from algorithm.score import schedule_score
+def api_json2score(request):
+    if request.method == 'POST':
+        try:
+            q_result_file_name = request.POST.get('result_file_name')
+            print(q_result_file_name)
+            with open(os.path.join('results', q_result_file_name), encoding='utf-8') as f:
+                result = json.loads(f.read())
+                courses = []
+                for course_id in result.keys():
+                    course = MyCourse(Course.objects.get(course_id=course_id))
+                    course.course_classroom = MyClassroom(Classroom.objects.get(classroom_id=result[course_id]['classroom']))
+                    course.course_time = [MyTime(semester='1', week=week, day=day, class_num=class_num) for week, day, class_num in [list(map(int, time.split('-')[-3:])) for time in result[course_id]['time'][1:-1].split(', ')]]
+                    course.course_teacher = list(map(int, result[course_id]['teacher'][1:-1].split('-')))
+                    courses.append(course)
+
+            _, score, hard, soft = schedule_score([courses], 1)
+            ret_getdict = {'code': 200, 'msg': "计算成功", 'score': score, 'hard': hard, 'soft': soft}
+            return JsonResponse(ret_getdict)
+        except Exception as ex:
+            print(ex)
+            ret_getdict = {'code': 400, 'msg': "计算失败"}
+            return JsonResponse(ret_getdict)
+    else:
+        ret_getdict = {'code': 400, 'msg': "计算失败"}
+        return JsonResponse(ret_getdict)

@@ -80,7 +80,7 @@ class MyTime:
         return '-'.join([self.semester, str(self.week), str(self.day), str(self.class_num)])
 
     def class_num_for_semester(self):
-        return (self.week - 1) * 7 * 12 + (self.day - 1) * 12 + self.class_num
+        return (self.week - 1) * 7 * 14 + (self.day - 1) * 14 + self.class_num
     def __cmp__(self,other):
         if self.week==other.week and self.day==other.day:
             return self.class_num<other.class_num
@@ -155,8 +155,8 @@ class GeneticOptimize:
         e = np.random.randint(0, self.elite, 1)[0]
         ep = copy.deepcopy(eiltePopulation[e])
         for p in ep:
-            pos = np.random.randint(0, 5, 1)[0]
-            if pos == 0: # classroom
+            pos = np.random.randint(0, 8, 1)[0]
+            if pos == 0 or pos >= 5: # classroom
                 p.course_classroom = rand_classroom(p, classrooms)
             else:
                 _time = rand_time(p, num=p.course_hour)
@@ -169,10 +169,41 @@ class GeneticOptimize:
                 elif pos == 3: # class_num
                     for i in range(len(p.course_time)):
                         p.course_time[i].class_num = _time[i].class_num
-                else:
+                elif pos == 4:
                     for i in range(len(p.course_time)):
                         p.course_time[i] = _time[i]
                 p.course_time = sorted(p.course_time)
+        return ep
+
+    #变异2
+    def mutate2(self, eiltePopulation, classrooms):
+        #选择变异的个数
+        e = np.random.randint(0, self.elite, 1)[0]
+        ep = copy.deepcopy(eiltePopulation[e])
+        import collections
+        mp = collections.defaultdict( lambda: {'classroom': collections.defaultdict(lambda: 0), 'teacher': collections.defaultdict(lambda: 0) } )
+        for i in range(len(ep)):
+            for _ in range(5):
+                confict = 0
+                for time in ep[i].course_time:
+                    try:
+                        confict += mp[time.class_num_for_semester()]['classroom'][ep[i].course_classroom.classroom_id]
+                    except:
+                        import pdb; pdb.set_trace()
+                    for teacher_id in ep[i].course_teacher:
+                        confict += mp[time.class_num_for_semester()]['teacher'][teacher_id]
+                if confict == 0:
+                    break
+                if np.random.randint(0, 2, 1)[0] == 0:
+                    ep[i].course_classroom = rand_classroom(ep[i], classrooms)
+                else:
+                    ep[i].course_time = rand_time(ep[i], num=ep[i].course_hour)
+           
+            for time in ep[i].course_time:
+                mp[time.class_num_for_semester()]['classroom'][ep[i].course_classroom.classroom_id] += 1
+                for teacher_id in ep[i].course_teacher:
+                    mp[time.class_num_for_semester()]['teacher'][teacher_id] += 1
+
         return ep
 
     def crossover(self, eiltePopulation):
@@ -212,20 +243,22 @@ class GeneticOptimize:
         print("init_population time: {}s".format(round(time.time()-timestamp)))
         for i in range(self.maxiter):
             timestamp = time.time()
-            eliteIndex, bestScore = schedule_score(self.population, self.elite)
-            print('Iter: {} | loss: {}, time: {}s'.format(i + 1, bestScore, round(time.time()-timestamp)))
+            eliteIndex, bestScore, hard, soft = schedule_score(self.population, self.elite)
+            print('Iter: {} | loss: {}, hard: {}, soft: {}, time: {}s'.format(i + 1, bestScore, hard, soft, round(time.time()-timestamp)))
             bestcourses = self.population[eliteIndex[0]]
             if bestScore == 0:
                 break
             newPopulation = [self.population[index] for index in eliteIndex]
             while len(newPopulation) < self.popsize:
-                if np.random.rand() < self.mutprob:
+                if hard > 0:
+                    newp = self.mutate2(newPopulation, classrooms)
+                elif np.random.rand() < self.mutprob:
                     newp = self.mutate(newPopulation, classrooms)
                 else:
                     newp = self.crossover(newPopulation)
                 newPopulation.append(newp)
             self.population = newPopulation
-            if i % 10 == 0:
+            if i % 2 == 0:
                 result = {
                     course.course_id: {
                         'teacher': str(course.course_teacher),

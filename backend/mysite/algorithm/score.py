@@ -75,7 +75,7 @@ def schedule_score(population, elite_num):
         final_scores.append(hard_weight * hard + soft_weight * soft)
     index = np.array(final_scores).argsort()
 
-    return index[:elite_num], final_scores[index[0]]
+    return index[:elite_num], final_scores[index[0]], conficts[index[0]], scores[index[0]]
 
 
 def timetable_score(courses):

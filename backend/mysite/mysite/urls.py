@@ -45,4 +45,5 @@ urlpatterns = [
     path("getteacher/", api.api_getteacher),
     path("getstudent/", api.api_getstudent),
     path("getresultlist/", api.api_getresultlist),
+    path("json2score/", api.api_json2score),
 ]
