@@ -80,7 +80,8 @@ class MyTime:
         return '-'.join([self.semester, str(self.week), str(self.day), str(self.class_num)])
 
     def class_num_for_semester(self):
-        return (self.week - 1) * 7 * 14 + (self.day - 1) * 14 + self.class_num
+        return self.week * 10000 + self.day * 100 + self.class_num
+    
     def __cmp__(self,other):
         if self.week==other.week and self.day==other.day:
             return self.class_num<other.class_num
@@ -155,8 +156,34 @@ class GeneticOptimize:
         e = np.random.randint(0, self.elite, 1)[0]
         ep = copy.deepcopy(eiltePopulation[e])
         for p in ep:
-            pos = np.random.randint(0, 8, 1)[0]
-            if pos == 0 or pos >= 5: # classroom
+            pos = np.random.randint(0, 5, 1)[0]
+            if pos == 0: # classroom
+                p.course_classroom = rand_classroom(p, classrooms)
+            else:
+                _time = rand_time(p, num=p.course_hour)
+                if pos == 1: # week
+                    for i in range(len(p.course_time)):
+                        p.course_time[i].week = _time[i].week
+                elif pos == 2: # day
+                    for i in range(len(p.course_time)):
+                        p.course_time[i].day = _time[i].day
+                elif pos == 3: # class_num
+                    for i in range(len(p.course_time)):
+                        p.course_time[i].class_num = _time[i].class_num
+                elif pos == 4:
+                    for i in range(len(p.course_time)):
+                        p.course_time[i] = _time[i]
+                p.course_time = sorted(p.course_time)
+        return ep
+    
+    def mutate3(self, eiltePopulation, classrooms):
+        #选择变异的个数
+        e = np.random.randint(0, self.elite, 1)[0]
+        ep = copy.deepcopy(eiltePopulation[e])
+        np.random.shuffle(ep)
+        for p in ep[:np.random.choice(range(len(ep)//2))+1]:
+            pos = np.random.randint(0, 5, 1)[0]
+            if pos == 0: # classroom
                 p.course_classroom = rand_classroom(p, classrooms)
             else:
                 _time = rand_time(p, num=p.course_hour)
@@ -181,17 +208,14 @@ class GeneticOptimize:
         e = np.random.randint(0, self.elite, 1)[0]
         ep = copy.deepcopy(eiltePopulation[e])
         import collections
-        mp = collections.defaultdict( lambda: {'classroom': collections.defaultdict(lambda: 0), 'teacher': collections.defaultdict(lambda: 0) } )
+        mp = collections.defaultdict(lambda: 0)
         for i in range(len(ep)):
             for _ in range(5):
                 confict = 0
                 for time in ep[i].course_time:
-                    try:
-                        confict += mp[time.class_num_for_semester()]['classroom'][ep[i].course_classroom.classroom_id]
-                    except:
-                        import pdb; pdb.set_trace()
+                    confict += mp['%s-%s' % (time, ep[i].course_classroom)]
                     for teacher_id in ep[i].course_teacher:
-                        confict += mp[time.class_num_for_semester()]['teacher'][teacher_id]
+                        confict += mp['%s-%s' % (time, teacher_id)]
                 if confict == 0:
                     break
                 if np.random.randint(0, 2, 1)[0] == 0:
@@ -200,9 +224,9 @@ class GeneticOptimize:
                     ep[i].course_time = rand_time(ep[i], num=ep[i].course_hour)
            
             for time in ep[i].course_time:
-                mp[time.class_num_for_semester()]['classroom'][ep[i].course_classroom.classroom_id] += 1
+                mp['%s-%s' % (time, ep[i].course_classroom.classroom_id)] += 1
                 for teacher_id in ep[i].course_teacher:
-                    mp[time.class_num_for_semester()]['teacher'][teacher_id] += 1
+                    mp['%s-%s' % (time, teacher_id)] += 1
 
         return ep
 
@@ -253,7 +277,7 @@ class GeneticOptimize:
                 if hard > 0:
                     newp = self.mutate2(newPopulation, classrooms)
                 elif np.random.rand() < self.mutprob:
-                    newp = self.mutate(newPopulation, classrooms)
+                    newp = self.mutate3(newPopulation, classrooms)
                 else:
                     newp = self.crossover(newPopulation)
                 newPopulation.append(newp)

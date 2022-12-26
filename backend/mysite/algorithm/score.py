@@ -42,29 +42,17 @@ def schedule_score(population, elite_num):
     for pid, p in enumerate(population):
         confict = 0
         # 不同课程冲突
-        mp = collections.defaultdict(
-            lambda: {
-                'classroom': collections.defaultdict(lambda: 0),
-                'teacher': collections.defaultdict(lambda: 0),
-            }
-        )
-        for i in range(0, n):
-            # 自身排课就冲突
-            mp2 = collections.defaultdict(lambda: 0)
-            for time in p[i].course_time:
-                confict += mp2[time]
-                mp2[time] += 1
-
-            
+        mp = collections.defaultdict(lambda: 0)
+        for i in range(0, n):           
             for time in p[i].course_time:
                 # 教室冲突
-                confict += mp[time.class_num_for_semester()]['classroom'][p[i].course_classroom.classroom_id]
-                mp[time.class_num_for_semester()]['classroom'][p[i].course_classroom.classroom_id] += 1
+                confict += mp['%s-%s' % (time, p[i].course_classroom)]
+                mp['%s-%s' % (time, p[i].course_classroom.classroom_id)] += 1
 
                 # 教师冲突
                 for teacher_id in p[i].course_teacher:
-                    confict += mp[time.class_num_for_semester()]['teacher'][teacher_id]
-                    mp[time.class_num_for_semester()]['teacher'][teacher_id] += 1
+                    confict += mp['%s-%s' % (time, teacher_id)]
+                    mp['%s-%s' % (time, teacher_id)] += 1
 
         conficts.append(confict)
 
