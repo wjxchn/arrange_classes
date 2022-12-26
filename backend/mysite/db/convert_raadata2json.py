@@ -130,8 +130,8 @@ def read_excel(filename):
             datas = cursor.fetchall()
             classroom_id = datas[0][0]
 
-            res_dict[f'{str(c_id)}'] = {'teacher': [t_id],
-                                        'time': times,
+            res_dict[f'{str(c_id)}'] = {'teacher': f'[{t_id}]',
+                                        'time': '['+', '.join(times)+']',
                                         'classroom':str(classroom_id)}
             c_id+=1
 
