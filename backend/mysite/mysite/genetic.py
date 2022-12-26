@@ -238,9 +238,8 @@ class GeneticOptimize:
         _len = len(ep1)
         if np.random.randint(0, 2, 1)[0] == 1:
             _len = np.random.choice(range(len(ep1)//2))+1
-
         pos = np.random.randint(0, 4, 1)[0]
-        for p1, p2 in zip(ep1[_len], ep2[_len]):
+        for p1, p2 in zip(ep1[:_len], ep2[:_len]):
             if pos == 0:
                 p1.course_classroom = p2.course_classroom
             else:
@@ -286,14 +285,13 @@ class GeneticOptimize:
                     newp = self.crossover(newPopulation)
                 newPopulation.append(newp)
             self.population = newPopulation
-            if i % 2 == 0:
-                result = {
-                    course.course_id: {
-                        'teacher': str(course.course_teacher),
-                        'time': str(course.course_time),
-                        'classroom': str(course.course_classroom.classroom_id),
-                    } for course in courses
-                }
-                with open(save_path, 'w', encoding='utf8') as f:
-                    json.dump(result, f, ensure_ascii=False, indent=2)
+            result = {
+                course.course_id: {
+                    'teacher': str(course.course_teacher),
+                    'time': str(course.course_time),
+                    'classroom': str(course.course_classroom.classroom_id),
+                } for course in bestcourses
+            }
+            with open(save_path, 'w', encoding='utf8') as f:
+                json.dump(result, f, ensure_ascii=False, indent=2)
         return bestcourses
