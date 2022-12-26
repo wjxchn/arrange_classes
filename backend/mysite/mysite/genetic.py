@@ -235,8 +235,12 @@ class GeneticOptimize:
         e2 = np.random.randint(0, self.elite, 1)[0]
         ep1 = copy.deepcopy(eiltePopulation[e1])
         ep2 = eiltePopulation[e2]
+        _len = len(ep1)
+        if np.random.randint(0, 2, 1)[0] == 1:
+            _len = np.random.choice(range(len(ep1)//2))+1
+
         pos = np.random.randint(0, 4, 1)[0]
-        for p1, p2 in zip(ep1, ep2):
+        for p1, p2 in zip(ep1[_len], ep2[_len]):
             if pos == 0:
                 p1.course_classroom = p2.course_classroom
             else:
