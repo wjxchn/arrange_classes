@@ -228,7 +228,7 @@ class GeneticOptimize:
                     ep[i].course_time = rand_time(ep[i], num=ep[i].course_hour)
            
             for time in ep[i].course_time:
-                mp['%s-%s' % (time, ep[i].course_classroom.classroom_id)] += 1
+                mp['%s-%s' % (time, ep[i].course_classroom)] += 1
                 for teacher_id in ep[i].course_teacher:
                     mp['%s-%s' % (time, teacher_id)] += 1
 
