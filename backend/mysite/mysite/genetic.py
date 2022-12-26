@@ -180,26 +180,28 @@ class GeneticOptimize:
         #选择变异的个数
         e = np.random.randint(0, self.elite, 1)[0]
         ep = copy.deepcopy(eiltePopulation[e])
-        np.random.shuffle(ep)
-        for p in ep[:np.random.choice(range(len(ep)//2))+1]:
+        permutation = [i for i in range(len(ep))]
+        np.random.shuffle(permutation)
+        for pid in permutation[:np.random.choice(range(len(ep)//2))+1]:
+        # for p in ep[:np.random.choice(range(len(ep)//2))+1]:
             pos = np.random.randint(0, 5, 1)[0]
             if pos == 0: # classroom
-                p.course_classroom = rand_classroom(p, classrooms)
+                ep[pid].course_classroom = rand_classroom(ep[pid], classrooms)
             else:
-                _time = rand_time(p, num=p.course_hour)
+                _time = rand_time(ep[pid], num=ep[pid].course_hour)
                 if pos == 1: # week
-                    for i in range(len(p.course_time)):
-                        p.course_time[i].week = _time[i].week
+                    for i in range(len(ep[pid].course_time)):
+                        ep[pid].course_time[i].week = _time[i].week
                 elif pos == 2: # day
-                    for i in range(len(p.course_time)):
-                        p.course_time[i].day = _time[i].day
+                    for i in range(len(ep[pid].course_time)):
+                        ep[pid].course_time[i].day = _time[i].day
                 elif pos == 3: # class_num
-                    for i in range(len(p.course_time)):
-                        p.course_time[i].class_num = _time[i].class_num
+                    for i in range(len(ep[pid].course_time)):
+                        ep[pid].course_time[i].class_num = _time[i].class_num
                 elif pos == 4:
-                    for i in range(len(p.course_time)):
-                        p.course_time[i] = _time[i]
-                p.course_time = sorted(p.course_time)
+                    for i in range(len(ep[pid].course_time)):
+                        ep[pid].course_time[i] = _time[i]
+                ep[pid].course_time = sorted(ep[pid].course_time)
         return ep
 
     #变异2
@@ -208,9 +210,10 @@ class GeneticOptimize:
         e = np.random.randint(0, self.elite, 1)[0]
         ep = copy.deepcopy(eiltePopulation[e])
         import collections
-        np.random.shuffle(ep)
         mp = collections.defaultdict(lambda: 0)
-        for i in range(len(ep)):
+        permutation = [i for i in range(len(ep))]
+        np.random.shuffle(permutation)
+        for i in permutation:
             for _ in range(5):
                 confict = 0
                 for time in ep[i].course_time:

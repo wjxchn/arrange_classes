@@ -46,14 +46,13 @@ def schedule_score(population, elite_num):
         for i in range(0, n):           
             for time in p[i].course_time:
                 # 教室冲突
-                confict += mp['%s-%s' % (time, p[i].course_classroom)]
-                mp['%s-%s' % (time, p[i].course_classroom.classroom_id)] += 1
+                confict += mp['%s, classroom: %s' % (time, p[i].course_classroom)]
+                mp['%s, classroom: %s' % (time, p[i].course_classroom)] += 1
 
                 # 教师冲突
                 for teacher_id in p[i].course_teacher:
-                    confict += mp['%s-%s' % (time, teacher_id)]
-                    mp['%s-%s' % (time, teacher_id)] += 1
-
+                    confict += mp['%s, teacher: %s' % (time, teacher_id)]
+                    mp['%s, teacher: %s' % (time, teacher_id)] += 1
         conficts.append(confict)
 
     for courses in population:
