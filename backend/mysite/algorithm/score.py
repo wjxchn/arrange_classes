@@ -41,21 +41,21 @@ def schedule_score(population, elite_num):
     n = len(population[0])
     for pid, p in enumerate(population):
         confict = 0
-        
+        # 不同课程冲突
+        mp = collections.defaultdict(
+            lambda: {
+                'classroom': collections.defaultdict(lambda: 0),
+                'teacher': collections.defaultdict(lambda: 0),
+            }
+        )
         for i in range(0, n):
             # 自身排课就冲突
-            mp = collections.defaultdict(lambda: 0)
+            mp2 = collections.defaultdict(lambda: 0)
             for time in p[i].course_time:
-                confict += mp[time]
-                mp[time] += 1
+                confict += mp2[time]
+                mp2[time] += 1
 
-            # 不同课程冲突
-            mp = collections.defaultdict(
-                lambda: {
-                    'classroom': collections.defaultdict(lambda: 0),
-                    'teacher': collections.defaultdict(lambda: 0),
-                }
-            )
+            
             for time in p[i].course_time:
                 # 教室冲突
                 confict += mp[time.class_num_for_semester()]['classroom'][p[i].course_classroom.classroom_id]
