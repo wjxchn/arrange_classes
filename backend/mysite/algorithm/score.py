@@ -36,7 +36,7 @@ def schedule_score(population, elite_num):
     conficts = []
     scores = []
     final_scores = []
-    hard_weight = 10000000
+    hard_weight = 1e9
     soft_weight = 1
     n = len(population[0])
     for pid, p in enumerate(population):
@@ -85,7 +85,7 @@ def timetable_score(courses):
     scores = []
     for course in courses:
         unweighted_score = course_score(course)
-        weighted_score = unweighted_score * priority_course(course)
+        weighted_score = -1 * unweighted_score * priority_course(course)
         scores.append(weighted_score)
     return sum(scores)
 
@@ -181,7 +181,7 @@ def course_score(course, alpha=1.0, beta=1.0, gamma=1.0):
     classroom = course.course_classroom
     score_room += classroom.classroom_capacity - course.course_max_capacity
 
-    score = alpha * score_time + beta * score_constraint - gamma * score_room
+    score = alpha * score_time + beta * score_constraint - gamma / 100.0 * score_room
     return score
 
 
@@ -290,3 +290,4 @@ def get_max_min_day(weeks, days):
             cur_day.add(days[i])
             pre_week = weeks[i]
     return max_day, min_day
+
