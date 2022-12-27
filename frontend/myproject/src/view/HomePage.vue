@@ -23,7 +23,7 @@
       </a-select>
     </a-space>
     <a-space v-show="layout=='manualchange'" style="margin-bottom: 60px; margin-left:20px;">
-      教室名称
+      新教室名称
       <a-select
         v-model="classroomvalue"
         :options="classroomoptions"
@@ -48,14 +48,41 @@
       >
       </a-select>
     </a-space>
+    <a-space v-show="layout=='manualchange'" style="margin-bottom: 60px; margin-left:20px;">
+      选择排课结果
+      <a-select
+        v-model="resultvalue"
+        :options="resultoptions"
+        :field-names="resultfieldnames"
+        :style="{width:'320px'}"
+        placeholder="Please select ..."
+        @dropdown-scroll="handleScroll"
+        @dropdown-reach-bottom="handleReachBottom"
+      >
+      </a-select>
+    </a-space>
+    <a-space v-show="layout=='manualchange'" style="margin-bottom: 60px; margin-left:20px;">
+      重新排课的开始周次
+      <a-input-number v-model="weekstartvalue" :style="{width:'320px'}" placeholder="Please Enter" class="input-demo" :min="0" :max="100"/>
+    </a-space>
+    <a-space v-show="layout=='manualchange'" style="margin-bottom: 60px; margin-left:20px;">
+      重新排课的结束周次
+      <a-input-number v-model="weekendvalue" :style="{width:'320px'}" placeholder="Please Enter" class="input-demo" :min="0" :max="100"/>
+    </a-space>
+    <a-space v-show="layout=='manualchange'" style="margin-bottom: 60px; margin-left:20px;">
+      <a-button type="primary" @click="manualarrangefunc">确定</a-button>
+    </a-space>
   </div>
 </template>
 
 <script>
-import { reactive, ref } from 'vue';
-
+import { reactive, ref, getCurrentInstance } from 'vue';
+import qs from 'qs'
 export default {
   setup() {
+    const weekstartvalue = ref(0)
+    const weekendvalue = ref(0)
+    const {proxy} = getCurrentInstance()
     const layout = ref('autoarrange')
     const handleScroll = (ev) => {
       console.log('scroll', ev)
@@ -71,8 +98,83 @@ export default {
     const classroomoptions = reactive([]);
     const modevalue = ref('');
     const modefieldnames = {value: 'id', label: 'text'}
-    const modeoptions = reactive([]);
+    const modeoptions = reactive([
+      {
+        id: 'update',
+        text: '更新'
+      },
+      {
+        id: 'add',
+        text: '新增'
+      },
+      {
+        id: 'del',
+        text: '删除'
+      }
+    ]);
+    const resultvalue = ref('');
+    const resultfieldnames = {value: 'id', label: 'text'}
+    const resultoptions = reactive([])
+    const getCourseData = function(){
+      proxy.$http.get("getclass/").then((res) => {
+        console.log(res);
+        res.data.classrooms.forEach(element => {
+          courseoptions.push({
+            id: element.id,
+            text: element.name,
+          })
+        });
+      }) .catch((res) => {
+        console.log(res);
+      });
+    }
+    getCourseData()
+    const getClassroomData = function(){
+      proxy.$http.get("getclassroom/").then((res) => {
+        console.log(res);
+        res.data.classrooms.forEach(element => {
+          classroomoptions.push({
+            id: element.id,
+            text: element.name,
+          })
+        });
+      }) .catch((res) => {
+        console.log(res);
+      });
+    }
+    getClassroomData()
+    const getResultData = function(){
+      proxy.$http.get("getresultlist/").then((res) => {
+        console.log(res);
+        res.data.result_list.forEach(element => {
+          resultoptions.push({
+            id: element,
+            text: element,
+          })
+        });
+      }) .catch((res) => {
+        console.log(res);
+      });
+    }
+    getResultData()
+    const manualarrangefunc = function(){
+      proxy.$http.post("manualchangeclasstable/", qs.stringify({
+        result_file_name: resultvalue.value,
+        course_id: coursevalue.value,
+        classroom_id: classroomvalue.value,
+        st_week: weekstartvalue.value,
+        ed_week: weekendvalue.value,
+        mode: modevalue.value
+      })).then((res) => {
+        alert('更新成功')
+        console.log(res);
+      }) .catch((res) => {
+        console.log(res);
+      });
+    }
     return {
+      weekstartvalue,
+      weekendvalue,
       layout,
       handleScroll,
       handleReachBottom,
@@ -84,7 +186,11 @@ export default {
       classroomoptions,
       modevalue,
       modefieldnames,
-      modeoptions
+      modeoptions,
+      resultvalue,
+      resultfieldnames,
+      resultoptions,
+      manualarrangefunc
     }
   },
 }

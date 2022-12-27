@@ -662,9 +662,9 @@ def api_getcoursetablebystudent(request):
             print(ex)
             ret_getdict = {'code': 300, 'msg': "查询失败"}
             return JsonResponse(ret_getdict)
-        else:
-            ret_getdict = {'code': 400, 'msg': "查询失败"}
-            return JsonResponse(ret_getdict)
+    else:
+        ret_getdict = {'code': 400, 'msg': "查询失败"}
+        return JsonResponse(ret_getdict)
 
 
 # 查看所有老师
