@@ -474,6 +474,7 @@ def api_manualchangeclasstable(request):
         try:
             q_result_file_name = request.POST.get('result_file_name')
             course_id = request.POST.get('course_id')
+            classroom_id = request.POST.get('classroom_id')
             st_week, ed_week = request.POST.get('st_week'), request.POST.get('ed_week')
             mode = request.POST.get('mode')
             
@@ -492,6 +493,8 @@ def api_manualchangeclasstable(request):
                                 elif mode == 'del':
                                     result[course_id]['time'].remove(str(MyTime(semester='2021-1', week=week, day=day, class_num=class_num)))
                 result[course_id]['time'] = ', '.join([str(x) for x in result[course_id]['time']])
+                if classroom_id != None:
+                    result[course_id]['classroom'] = str(classroom_id)
                 ret_getdict = {'code': 200, 'msg': "计算成功", 'result': result}
                 with open(os.path.join('results', '%s.json' % time.strftime('%Y-%m-%d-%H-%M-%S', time.localtime(time.time()))), 'w', encoding='utf8') as f:
                     json.dump(result, f, ensure_ascii=False, indent=2)
