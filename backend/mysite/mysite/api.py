@@ -1,4 +1,5 @@
 import os
+import time
 import json
 from django.http import JsonResponse, HttpResponse
 from django.contrib.auth import hashers
@@ -418,12 +419,90 @@ def api_selectcourse(request):
 
 
 def api_autochangeclasstable(request):
-    ret_getdict = {'code': 400, 'msg': "查询失败"}
-    return JsonResponse(ret_getdict)
+    if request.method == 'POST':
+        # try:
+        q_result_file_name = request.POST.get('result_file_name')
+        with open(os.path.join('results', q_result_file_name), encoding='utf-8') as f:
+            result = json.loads(f.read())
+
+            course_ids = request.POST.get('course_id')
+            update_classroom_id = request.POST.get('update_classroom_id')
+            course_ids = course_ids[1:-1].split(', ') if course_ids != None else []
+            courses1, courses2 = [], []
+            for course_id in result.keys():
+                course = MyCourse(Course.objects.get(course_id=course_id))
+                if (not course_id in course_ids) and (result[course_id]['classroom'] != update_classroom_id):
+                    course.course_classroom = MyClassroom(Classroom.objects.get(classroom_id=result[course_id]['classroom']))
+                    course.course_time = [MyTime(semester='1', week=week, day=day, class_num=class_num) for week, day, class_num in [list(map(int, time.split('-')[-3:])) for time in result[course_id]['time'][1:-1].split(', ')]]
+                    course.course_teacher = list(map(int, result[course_id]['teacher'][1:-1].split('-')))
+                    courses1.append(course)
+                else:
+                    courses2.append(course)
+
+            if len(courses2) == 0:
+                res = {'code': 100, 'msg': '排课成功，但是课表不会改变'}
+                return JsonResponse(res)
+            
+            ga = GeneticOptimize(popsize=4, elite=2, mutprob=0.2, maxiter=50)
+            courses = ga._evolution(courses2, courses1, Classroom.objects.all())
+            courses.extend(courses1)
+            res = {'code': 200, 'msg': '排课成功'}
+            res['ans'] = {}
+            for course in courses:
+                res['ans'][course.course_id] = {
+                    'teacher': str(course.course_teacher),
+                    'time': str(course.course_time),
+                    'classroom': str(course.course_classroom.classroom_id),
+                } 
+                if res['ans'][course.course_id]['teacher'] != result[str(course.course_id)]['teacher']:
+                    res['ans'][course.course_id]['pre_teacher'] = result[str(course.course_id)]['teacher']
+                if res['ans'][course.course_id]['time'] != result[str(course.course_id)]['time']:
+                    res['ans'][course.course_id]['pre_time'] = result[str(course.course_id)]['time']
+                if res['ans'][course.course_id]['classroom'] != result[str(course.course_id)]['classroom']:
+                    res['ans'][course.course_id]['pre_classroom'] = result[str(course.course_id)]['classroom']
+            return JsonResponse(res)
+        # except Exception as ex:
+        #     print(ex)
+        #     ret_getdict = {'code': 300, 'msg': "自动调整失败"}
+        #     return JsonResponse(ret_getdict)
+    else:
+        ret_getdict = {'code': 400, 'msg': "自动调整失败"}
 
 
 def api_manualchangeclasstable(request):
-    ret_getdict = {'code': 400, 'msg': "查询失败"}
+    if request.method == 'POST':
+        try:
+            q_result_file_name = request.POST.get('result_file_name')
+            course_id = request.POST.get('course_id')
+            st_week, ed_week = request.POST.get('st_week'), request.POST.get('ed_week')
+            mode = request.POST.get('mode')
+            
+            with open(os.path.join('results', q_result_file_name), encoding='utf-8') as f:
+                result = json.loads(f.read())
+                if mode == 'update':
+                    result[course_id]['time'] = []
+                else:
+                    result[course_id]['time'] = result[course_id]['time'][1:-1].split(', ')
+                for week in range(int(st_week), int(ed_week) + 1):
+                    for day in range(1, 8):
+                        for class_num in range(1, 15):
+                            if request.POST.get('%d-%d' % (day, class_num)) == '1':
+                                if mode == 'add' or mode == 'update':
+                                    result[course_id]['time'].append(MyTime(semester='2021-1', week=week, day=day, class_num=class_num))
+                                elif mode == 'del':
+                                    result[course_id]['time'].remove(str(MyTime(semester='2021-1', week=week, day=day, class_num=class_num)))
+                result[course_id]['time'] = ', '.join([str(x) for x in result[course_id]['time']])
+                ret_getdict = {'code': 200, 'msg': "计算成功", 'result': result}
+                with open(os.path.join('results', '%s.json' % time.strftime('%Y-%m-%d-%H-%M-%S', time.localtime(time.time()))), 'w', encoding='utf8') as f:
+                    json.dump(result, f, ensure_ascii=False, indent=2)
+                return JsonResponse(ret_getdict)
+        except Exception as ex:
+            print(ex)
+            ret_getdict = {'code': 300, 'msg': "手动调整失败"}
+            return JsonResponse(ret_getdict)
+    else:
+        ret_getdict = {'code': 400, 'msg': "手动调整失败"}
+    
     return JsonResponse(ret_getdict)
 
 

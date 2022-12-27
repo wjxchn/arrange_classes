@@ -5,7 +5,7 @@ import numpy as np
 import time
 
 from db.models import User, Student, Teacher, Admin, Course, Course_constraint, Classroom, Course_table
-from algorithm.score import schedule_score
+from algorithm.score import schedule_score, _schedule_score
 
 class MyCourse:
     def __init__(self, course) -> None:
@@ -231,7 +231,39 @@ class GeneticOptimize:
                 mp['%s-%s' % (time, ep[i].course_classroom)] += 1
                 for teacher_id in ep[i].course_teacher:
                     mp['%s-%s' % (time, teacher_id)] += 1
+        return ep
 
+    def _mutate2(self, eiltePopulation, classrooms, fix_courses):
+        #选择变异的个数
+        e = np.random.randint(0, self.elite, 1)[0]
+        ep = copy.deepcopy(eiltePopulation[e])
+        import collections
+        mp = collections.defaultdict(lambda: 0)
+        for course in fix_courses:
+            for time in course.course_time:
+                mp['%s-%s' % (time, course.course_classroom)] += 1
+                for teacher_id in course.course_teacher:
+                    mp['%s-%s' % (time, teacher_id)] += 1
+        permutation = [i for i in range(len(ep))]
+        np.random.shuffle(permutation)
+        for i in permutation:
+            for _ in range(5):
+                confict = 0
+                for time in ep[i].course_time:
+                    confict += mp['%s-%s' % (time, ep[i].course_classroom)]
+                    for teacher_id in ep[i].course_teacher:
+                        confict += mp['%s-%s' % (time, teacher_id)]
+                if confict == 0:
+                    break
+                if np.random.randint(0, 2, 1)[0] == 0:
+                    ep[i].course_classroom = rand_classroom(ep[i], classrooms)
+                else:
+                    ep[i].course_time = rand_time(ep[i], num=ep[i].course_hour)
+           
+            for time in ep[i].course_time:
+                mp['%s-%s' % (time, ep[i].course_classroom)] += 1
+                for teacher_id in ep[i].course_teacher:
+                    mp['%s-%s' % (time, teacher_id)] += 1
         return ep
 
     def crossover(self, eiltePopulation):
@@ -275,6 +307,47 @@ class GeneticOptimize:
         for i in range(self.maxiter):
             timestamp = time.time()
             eliteIndex, bestScore, hard, soft = schedule_score(self.population, self.elite)
+            print('Iter: {} | loss: {}, hard: {}, soft: {}, time: {}s'.format(i + 1, bestScore, hard, soft, round(time.time()-timestamp)))
+            bestcourses = self.population[eliteIndex[0]]
+            if bestScore == 0:
+                break
+            newPopulation = [self.population[index] for index in eliteIndex]
+            while len(newPopulation) < self.popsize:
+                if hard > 0:
+                    newp = self.mutate2(newPopulation, classrooms)
+                elif np.random.rand() < self.mutprob:
+                    newp = self.mutate3(newPopulation, classrooms)
+                else:
+                    newp = self.crossover(newPopulation)
+                newPopulation.append(newp)
+            self.population = newPopulation
+            result = {
+                course.course_id: {
+                    'teacher': str(course.course_teacher),
+                    'time': str(course.course_time),
+                    'classroom': str(course.course_classroom.classroom_id),
+                } for course in bestcourses
+            }
+            with open(save_path, 'w', encoding='utf8') as f:
+                json.dump(result, f, ensure_ascii=False, indent=2)
+        return bestcourses
+
+    
+    def _evolution(self, courses, fix_courses, classrooms):
+        save_path = os.path.join('results', '%s.json' % time.strftime('%Y-%m-%d-%H-%M-%S', time.localtime(time.time())))
+        print(save_path)
+        print('[evolution]')
+        print('init courses ok!')
+        classrooms = [MyClassroom(classroom) for classroom in classrooms]
+        print('init classrooms ok!')
+        bestScore = 0
+        bestcourses = None
+        timestamp = time.time()
+        self.init_population(courses, classrooms)
+        print("init_population time: {}s".format(round(time.time()-timestamp)))
+        for i in range(self.maxiter):
+            timestamp = time.time()
+            eliteIndex, bestScore, hard, soft = _schedule_score(self.population, self.elite, fix_courses)
             print('Iter: {} | loss: {}, hard: {}, soft: {}, time: {}s'.format(i + 1, bestScore, hard, soft, round(time.time()-timestamp)))
             bestcourses = self.population[eliteIndex[0]]
             if bestScore == 0:

@@ -1,5 +1,4 @@
-
-
+import copy
 import numpy as np
 import collections
 
@@ -25,7 +24,11 @@ course_biggest_sections_priority = 7 #每天最大上课节数
 no_course_sections_priority = 4 #不可排课的节数
 capacity_ratio_priority = 11 #课程容量和教室容量的比例
 
-
+def _schedule_score(population, elite_num, fix_courses):
+    tmp = copy.deepcopy(population)
+    for i in range(len(tmp)):
+        tmp[i].extend(fix_courses)
+    return schedule_score(tmp, elite_num)
 
 def schedule_score(population, elite_num):
     '''
@@ -33,6 +36,7 @@ def schedule_score(population, elite_num):
     contraints: 约束列表
     elite: 精英数量
     '''
+    # print([x.course_id for x in fix_courses])
     conficts = []
     scores = []
     final_scores = []
