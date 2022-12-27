@@ -166,10 +166,16 @@ export default {
         ed_week: weekendvalue.value,
         mode: modevalue.value
       })).then((res) => {
-        alert('更新成功')
         console.log(res);
+        if(res.data.code==200){
+          alert('手动重排成功')
+        }
+        else{
+          alert('手动排课失败')
+        }
       }) .catch((res) => {
         console.log(res);
+        alert('手动排课失败')
       });
     }
     return {
