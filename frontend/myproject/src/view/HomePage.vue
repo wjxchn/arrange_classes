@@ -67,11 +67,19 @@
     </a-space>
     <a-space v-show="layout=='manualchange'" style="margin-bottom: 60px; margin-left:20px;">
       重新排课的开始周次
-      <a-input-number v-model="weekstartvalue" :style="{width:'320px'}" placeholder="Please Enter" class="input-demo" :min="0" :max="100"/>
+      <a-input-number v-model="weekstartvalue" :style="{width:'320px'}" placeholder="Please Enter" class="input-demo" :min="1" :max="100"/>
     </a-space>
     <a-space v-show="layout=='manualchange'" style="margin-bottom: 60px; margin-left:20px;">
       重新排课的结束周次
-      <a-input-number v-model="weekendvalue" :style="{width:'320px'}" placeholder="Please Enter" class="input-demo" :min="0" :max="100"/>
+      <a-input-number v-model="weekendvalue" :style="{width:'320px'}" placeholder="Please Enter" class="input-demo" :min="1" :max="100"/>
+    </a-space>
+    <a-space v-show="layout=='manualchange'" style="margin-bottom: 60px; margin-left:20px;">
+      重新排课的星期
+      <a-input-number v-model="dayvalue" :style="{width:'320px'}" placeholder="Please Enter" class="input-demo" :min="1" :max="7"/>
+    </a-space>
+    <a-space v-show="layout=='manualchange'" style="margin-bottom: 60px; margin-left:20px;">
+      重新排课的节
+      <a-input-number v-model="classvalue" :style="{width:'320px'}" placeholder="Please Enter" class="input-demo" :min="1" :max="14"/>
     </a-space>
     <a-space v-show="layout=='manualchange'" style="margin-bottom: 60px; margin-left:20px;">
       <a-button type="primary" @click="manualarrangefunc">确定</a-button>
@@ -84,8 +92,10 @@ import { reactive, ref, getCurrentInstance } from 'vue';
 import qs from 'qs'
 export default {
   setup() {
-    const weekstartvalue = ref(0)
-    const weekendvalue = ref(0)
+    const weekstartvalue = ref(1)
+    const weekendvalue = ref(1)
+    const dayvalue = ref(1)
+    const classvalue = ref(1)
     const {proxy} = getCurrentInstance()
     const layout = ref('autoarrange')
     const handleScroll = (ev) => {
@@ -168,14 +178,17 @@ export default {
       });
     }
     const manualarrangefunc = function(){
-      proxy.$http.post("manualchangeclasstable/", qs.stringify({
+      var obj = {
         result_file_name: resultvalue.value,
         course_id: coursevalue.value,
         classroom_id: classroomvalue.value,
         st_week: weekstartvalue.value,
         ed_week: weekendvalue.value,
         mode: modevalue.value
-      })).then((res) => {
+      }
+      obj[String(dayvalue.value)+"-"+String(classvalue.value)] = 1
+      console.log(obj)
+      proxy.$http.post("manualchangeclasstable/", qs.stringify(obj)).then((res) => {
         console.log(res);
         if(res.data.code==200){
           alert('手动重排成功')
@@ -191,6 +204,8 @@ export default {
     return {
       weekstartvalue,
       weekendvalue,
+      dayvalue,
+      classvalue,
       layout,
       handleScroll,
       handleReachBottom,
