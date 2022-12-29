@@ -583,7 +583,7 @@ def api_getcoursetablebyclassroom(request):
                                 _tmp.append([[week], course_id, teacher_id])
                         res[class_num][day] = [' '.join([
                             '[{}-{}]'.format(week[0], week[-1]) if len(week) > 1 else '[{}]'.format(week[0]),
-                            '{}'.format(Course.objects.get(course_id=course_id).course_name),
+                            '{}-{}'.format(Course.objects.get(course_id=course_id).course_id, Course.objects.get(course_id=course_id).course_name),
                             ', '.join(
                                 ['{}'.format(Teacher.objects.get(teacher_id=id).teacher_name) for id in teacher_id]),
                         ]) for week, course_id, teacher_id in _tmp]
@@ -633,7 +633,7 @@ def api_getcoursetablebyteacher(request):
                                 _tmp.append([[week], course_id, teachers_id, classroom_id])
                         res[class_num][day] = [' '.join([
                             '[{}-{}]'.format(week[0], week[-1]) if len(week) > 1 else '[{}]'.format(week[0]),
-                            '{}'.format(Course.objects.get(course_id=course_id).course_name),
+                            '{}-{}'.format(Course.objects.get(course_id=course_id).course_id, Course.objects.get(course_id=course_id).course_name),
                             ', '.join(
                                 ['{}'.format(Teacher.objects.get(teacher_id=id).teacher_name) for id in teachers_id]),
                             '{}'.format(Classroom.objects.get(classroom_id=classroom_id).classroom_name),
@@ -692,7 +692,7 @@ def api_getcoursetablebystudent(request):
                                 _tmp.append([[week], course_id, teachers_id, classroom_id])
                         res[class_num][day] = [' '.join([
                             '[{}-{}]'.format(week[0], week[-1]) if len(week) > 1 else '[{}]'.format(week[0]),
-                            '{}'.format(Course.objects.get(course_id=course_id).course_name),
+                            '{}-{}'.format(Course.objects.get(course_id=course_id).course_id, Course.objects.get(course_id=course_id).course_name),
                             ', '.join(
                                 ['{}'.format(Teacher.objects.get(teacher_id=id).teacher_name) for id in teachers_id]),
                             '{}'.format(Classroom.objects.get(classroom_id=classroom_id).classroom_name),
