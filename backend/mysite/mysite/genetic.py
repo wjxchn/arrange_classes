@@ -362,6 +362,8 @@ class GeneticOptimize:
                     newp = self.crossover(newPopulation)
                 newPopulation.append(newp)
             self.population = newPopulation
+            new_results = bestcourses
+            new_results.extend(fix_courses)
             result = {
                 course.course_id: {
                     'teacher': str(course.course_teacher),
