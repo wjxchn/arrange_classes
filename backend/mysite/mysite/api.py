@@ -1,7 +1,8 @@
 import os
 import time
 import json
-from django.http import JsonResponse, HttpResponse
+import copy
+from django.http import JsonResponse, HttpResponse, QueryDict
 from django.contrib.auth import hashers
 from db.models import Author, User, Student, Teacher, Admin, Time, Course, Course_constraint, Classroom, Course_table
 from mysite.genetic import GeneticOptimize
@@ -428,6 +429,13 @@ def api_deleteclassroom(request):
             classroom = Classroom.objects.get(classroom_id=classroom_id)
             if classroom is not None:
                 classroom.delete()
+                request.POST = QueryDict(mutable=True)
+                request.POST['update_classroom_id'] = classroom_id
+                request.POST['result_file_name'] = sorted(os.listdir('results'), key=lambda x:os.stat(os.path.join('results', x))[8])[-1]
+                request.POST._mutable = False
+                print(request.POST)
+                api_autochangeclasstable(request)
+                print('ok')
                 ret_getdict = {'code': 200, 'msg': "删除成功"}
                 return JsonResponse(ret_getdict)
             else:
@@ -501,6 +509,7 @@ def api_autochangeclasstable(request):
             return JsonResponse(ret_getdict)
     else:
         ret_getdict = {'code': 400, 'msg': "自动调整失败"}
+        return JsonResponse(ret_getdict)
 
 
 def api_manualchangeclasstable(request):
