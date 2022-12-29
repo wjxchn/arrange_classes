@@ -8,6 +8,17 @@
       </a-radio-group>
     </a-space>
     <a-table v-show="layout=='byclassrooms'" :columns="classroom_columns" :data="classroom_data" :pagination="ispagination" column-resizable>
+      <template #name-filter="{ filterValue, setFilterValue, handleFilterConfirm, handleFilterReset}">
+        <div class="custom-filter">
+          <a-space direction="vertical">
+            <a-input :model-value="filterValue[0]" @input="(value)=>setFilterValue([value])" />
+            <div class="custom-filter-footer">
+              <a-button @click="handleFilterConfirm">Confirm</a-button>
+              <a-button @click="handleFilterReset">Reset</a-button>
+            </div>
+          </a-space>
+        </div>
+      </template>
       <template #optional="{ record }">
         <a-button @click="classroom_handleClick(record)">编辑教室信息</a-button>
         <a-modal v-model:visible="classroom_visible_var" @ok="classroom_handleOk" @cancel="classroom_handleCancel">
@@ -53,7 +64,8 @@
 </template>
 
 <script>
-import { reactive, ref, getCurrentInstance } from 'vue';
+import { reactive, ref, getCurrentInstance, h } from 'vue';
+import { IconSearch } from '@arco-design/web-vue/es/icon';
 import qs from 'qs'
 export default {
   setup() {
@@ -109,6 +121,11 @@ export default {
       {
         title: '名称',
         dataIndex: 'name',
+        filterable: {
+          filter: (value, record) => record.name.includes(value),
+          slotName: 'name-filter',
+          icon: () => h(IconSearch)
+        }
       },
       {
         title: '容量',

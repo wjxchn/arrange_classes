@@ -12,6 +12,7 @@
     <a-space v-show="layout=='manualchange'" style="margin-bottom: 60px; margin-left:20px;">
       课程名称
       <a-select
+        allow-search
         v-model="coursevalue"
         :options="courseoptions"
         :field-names="coursefieldnames"
@@ -25,6 +26,7 @@
     <a-space v-show="layout=='manualchange'" style="margin-bottom: 60px; margin-left:20px;">
       新教室名称
       <a-select
+        allow-search
         v-model="classroomvalue"
         :options="classroomoptions"
         :field-names="classroomfieldnames"
@@ -38,6 +40,7 @@
     <a-space v-show="layout=='manualchange'" style="margin-bottom: 60px; margin-left:20px;">
       选择模式
       <a-select
+        allow-search
         v-model="modevalue"
         :options="modeoptions"
         :field-names="modefieldnames"
@@ -51,6 +54,7 @@
     <a-space v-show="layout=='manualchange'" style="margin-bottom: 60px; margin-left:20px;">
       选择排课结果
       <a-select
+        allow-search
         v-model="resultvalue"
         :options="resultoptions"
         :field-names="resultfieldnames"

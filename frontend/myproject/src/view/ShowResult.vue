@@ -10,6 +10,7 @@
     <a-space v-show="layout=='byclassrooms'"  style="margin-bottom: 60px; margin-left:20px;">
       教室名称
       <a-select
+        allow-search
         v-model="classroomvalue"
         :options="classroomoptions"
         :field-names="classroomfieldnames"
@@ -23,6 +24,7 @@
     <a-space v-show="layout=='byteachers'"  style="margin-bottom: 60px; margin-left:20px;">
       教师名称
       <a-select
+        allow-search
         v-model="teachervalue"
         :options="teacheroptions"
         :field-names="teacherfieldnames"
@@ -36,6 +38,7 @@
     <a-space v-show="layout=='bystudents'"  style="margin-bottom: 60px; margin-left:20px;">
       学生名称
       <a-select
+        allow-search
         v-model="studentvalue"
         :options="studentoptions"
         :field-names="studentfieldnames"
@@ -49,6 +52,7 @@
     <a-space style="margin-bottom: 60px; margin-left:20px;">
       选择排课结果
       <a-select
+        allow-search
         v-model="resultvalue"
         :options="resultoptions"
         :field-names="resultfieldnames"
