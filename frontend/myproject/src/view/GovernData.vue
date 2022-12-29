@@ -249,7 +249,7 @@ export default {
         res.data.classrooms.forEach(element => {
           class_data.push({
             id: element.id,
-            name: element.name,
+            name: element.id + "-" + element.name,
             max_capacity: element.capacity,
             course_hour: element.hour,
             type: element.type,

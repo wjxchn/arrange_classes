@@ -125,7 +125,7 @@ export default {
         res.data.classrooms.forEach(element => {
           courseoptions.push({
             id: element.id,
-            text: element.name,
+            text: element.id + "-" + element.name,
           })
         });
       }) .catch((res) => {
