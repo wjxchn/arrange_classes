@@ -369,7 +369,7 @@ class GeneticOptimize:
                     'teacher': str(course.course_teacher),
                     'time': str(course.course_time),
                     'classroom': str(course.course_classroom.classroom_id),
-                } for course in bestcourses
+                } for course in new_results
             }
             with open(save_path, 'w', encoding='utf8') as f:
                 json.dump(result, f, ensure_ascii=False, indent=2)
