@@ -3,12 +3,12 @@
     <a-space direction="vertical" size="large" :style="{width: '600px'}"  style="margin-bottom: 60px;">
       <a-radio-group v-model="layout" type="button">
         <a-radio value="autoarrange">自动排课</a-radio>
-        <a-radio value="autochange">自动调整排课</a-radio>
         <a-radio value="manualchange">手动调整排课</a-radio>
       </a-radio-group>
     </a-space>
-    <a-space v-show="layout=='autoarrange'" style="margin-bottom: 60px; margin-left:20px;">黑</a-space>
-    <a-space v-show="layout=='autochange'" style="margin-bottom: 60px; margin-left:20px;">白</a-space>
+    <a-space v-show="layout=='autoarrange'" style="margin-bottom: 60px; margin-left:20px;">
+      <a-button type="primary" @click="arrangefunc">排课</a-button>
+    </a-space>
     <a-space v-show="layout=='manualchange'" style="margin-bottom: 60px; margin-left:20px;">
       课程名称
       <a-select
@@ -157,6 +157,12 @@ export default {
       });
     }
     getResultData()
+    const arrangefunc = function(){
+      alert('点击确定后排课，排课在后台进行，几分钟后刷新会有结果')
+      proxy.$http.post("arrangeclass/").then((res) => {
+      }) .catch((res) => {
+      });
+    }
     const manualarrangefunc = function(){
       proxy.$http.post("manualchangeclasstable/", qs.stringify({
         result_file_name: resultvalue.value,
@@ -196,6 +202,7 @@ export default {
       resultvalue,
       resultfieldnames,
       resultoptions,
+      arrangefunc,
       manualarrangefunc
     }
   },
